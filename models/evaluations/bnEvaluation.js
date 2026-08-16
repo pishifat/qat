@@ -28,6 +28,23 @@ bnEvaluationSchema.virtual('isNatEvaluation').get(function () {
     return isNatEvaluation(this);
 });
 
+bnEvaluationSchema.statics.createIfNoneActive = async function (doc) {
+    const userId = doc.user && doc.user._id ? doc.user._id : doc.user;
+    const existing = await this.findOne({ user: userId, mode: doc.mode, active: true });
+
+    if (existing) return existing;
+
+    try {
+        return await this.create(doc);
+    } catch (error) {
+        if (error.code === 11000) {
+            return this.findOne({ user: userId, mode: doc.mode, active: true });
+        }
+
+        throw error;
+    }
+};
+
 /**
  * @type {import('../interfaces/evaluations').IBnEvaluationModel}
  */

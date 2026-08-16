@@ -214,7 +214,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isLoggedIn, middle
             pendingEvaluation.deadline = deadline;
             await pendingEvaluation.save();
         } else {
-            await BnEvaluation.create({
+            await BnEvaluation.createIfNoneActive({
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
@@ -237,7 +237,7 @@ router.post('/resetEvaluationDeadline/:id/:mode', middlewares.isLoggedIn, middle
             pendingEvaluation.activityToCheck = activityToCheck;
             await pendingEvaluation.save();
         } else {
-            await BnEvaluation.create({
+            await BnEvaluation.createIfNoneActive({
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
@@ -1442,7 +1442,7 @@ router.post('/:id/addToNat', middlewares.isLoggedIn, middlewares.isNat, async (r
             error: 'You must select a game mode!',
         });
 
-    await Evaluation.deleteUserActiveEvaluations(user._id, mode);
+    await Evaluation.deleteMany({ user: user._id, mode, active: true });
     user.isTrialNat = false;
     const i = user.groups.findIndex(g => g === 'bn');
     if (i !== -1) user.groups.splice(i, 1, 'nat');
@@ -1469,7 +1469,7 @@ router.post('/:id/addToNat', middlewares.isLoggedIn, middlewares.isNat, async (r
     let deadline = new Date();
     deadline.setDate(deadline.getDate() + activityToCheck);
 
-    await BnEvaluation.create({
+    await BnEvaluation.createIfNoneActive({
         user: user._id,
         mode,
         deadline,
@@ -1602,7 +1602,7 @@ router.post('/:id/forceFullBn', middlewares.isLoggedIn, middlewares.isAdmin, asy
         pendingEvaluation.deadline = deadline;
         await pendingEvaluation.save();
     } else {
-        await BnEvaluation.create({
+        await BnEvaluation.createIfNoneActive({
             user,
             mode,
             deadline,

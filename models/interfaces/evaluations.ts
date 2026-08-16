@@ -71,6 +71,7 @@ export interface IBnEvaluationModel extends Model<IBnEvaluationDocument> {
     findActiveEvaluations?: (user: IUserDocument, isNat: boolean) => Promise<IBnEvaluationDocument[]>;
     findInactiveEvaluations?: () => Promise<IEvaluationDocument[]>;
     deleteUserActiveEvaluations?: (userId: number, mode: string) => Promise<{ ok: number, deletedCount: number, n: number }>;
+    createIfNoneActive?: (doc: Partial<IBnEvaluationDocument>) => Promise<IBnEvaluationDocument>;
 }
 
 export interface IResignationEvaluationDocument extends IEvaluationBase, Document {

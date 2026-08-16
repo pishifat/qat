@@ -253,6 +253,7 @@ class UserService extends mongoose.Model {
             } else if (!includeFullBns && !includeProbation && includeNat) {
                 query.match({
                     groups: 'nat',
+                    'modesInfo.level': 'evaluator',
                 });
             }
 

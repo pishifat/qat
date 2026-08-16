@@ -390,7 +390,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + activityToCheck);
 
-            await BnEvaluation.create({
+            await BnEvaluation.createIfNoneActive({
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,

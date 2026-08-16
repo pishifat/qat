@@ -6,6 +6,11 @@ const evaluationSchema = new mongoose.Schema({
     ...baseSchema,
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true }, discriminatorKey: 'kind' });
 
+evaluationSchema.index(
+    { user: 1, mode: 1, kind: 1 },
+    { unique: true, partialFilterExpression: { active: true }, name: 'unique_active_user_mode_kind' }
+);
+
 class EvaluationService extends mongoose.Model {
 
     static async findActiveEvaluations(user, isNat, isTrialNat) {

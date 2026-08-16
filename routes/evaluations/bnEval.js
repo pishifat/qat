@@ -194,6 +194,14 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         }
     }
 
+    const seen = new Set();
+    allEvalsToCreate = allEvalsToCreate.filter(e => {
+        const key = `${e.user}-${e.mode}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+
     if (!allEvalsToCreate.length) {
         return res.json({ error: 'No evaluations generated' });
     }
@@ -204,8 +212,20 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         await Evaluation.deleteUserActiveEvaluations(round.user, round.mode);
     }
 
+    const EvalModel = isResignation ? ResignationEvaluation : BnEvaluation;
+    const existing = await EvalModel.find({
+        active: true,
+        $or: allEvalsToCreate.map(e => ({ user: e.user, mode: e.mode })),
+    }).select('user mode');
+    const existingKeys = new Set(existing.map(e => `${e.user}-${e.mode}`));
+    allEvalsToCreate = allEvalsToCreate.filter(e => !existingKeys.has(`${e.user}-${e.mode}`));
+
+    if (!allEvalsToCreate.length) {
+        return res.json({ error: 'No evaluations generated' });
+    }
+
     // create BnEvaluations or Resignations
-    const result = isResignation ? await ResignationEvaluation.insertMany(allEvalsToCreate) : await BnEvaluation.insertMany(allEvalsToCreate);
+    const result = await EvalModel.insertMany(allEvalsToCreate);
 
     if (!result.length) return res.json({
         error: `Didn't create any`,
@@ -402,6 +422,7 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
 
     for (const evaluation of evaluations) {
         let resetSession = false;
+        let nextEval = null;
         let user = await User.findById(evaluation.user);
         const i = user.modesInfo.findIndex(m => m.mode === evaluation.mode);
         const isNatEvalArchive = userIsNatEvaluatorForMode(user, evaluation.mode);
@@ -429,13 +450,13 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 let deadline = new Date();
                 deadline.setDate(deadline.getDate() + random75);
 
-                await BnEvaluation.create({
+                nextEval = {
                     user: evaluation.user,
                     mode: evalMode,
                     deadline,
                     activityToCheck: random75,
                     natEvaluators: [evaluation.user],
-                });
+                };
 
                 evaluation.consensus = BnEvaluationConsensus.RemainInNat;
                 evaluation.feedback = 'None';
@@ -477,14 +498,13 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 let deadline = new Date();
                 let activityToCheck = 90;
                 deadline.setDate(deadline.getDate() + activityToCheck);
-                
 
-                await BnEvaluation.create({
+                nextEval = {
                     user: evaluation.user,
                     mode: evalMode,
                     deadline,
                     activityToCheck,
-                });
+                };
 
                 evaluation.consensus = BnEvaluationConsensus.MoveToBn;
                 resetSession = true;
@@ -568,13 +588,13 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             let activityToCheck = 37;
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + activityToCheck);
-            
-            await BnEvaluation.create({
+
+            nextEval = {
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
                 activityToCheck,
-            });
+            };
         }
 
         else if (evaluation.consensus === BnEvaluationConsensus.FullBn) {
@@ -597,17 +617,21 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             }
 
             await user.save();
-            await BnEvaluation.create({
+            nextEval = {
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
                 activityToCheck,
-            });
+            };
         }
 
         evaluation.active = false;
         evaluation.archivedAt = new Date();
         await evaluation.save();
+
+        if (nextEval) {
+            await BnEvaluation.createIfNoneActive(nextEval);
+        }
 
         // nat eval logs
         if (isNatEvalArchive) {
