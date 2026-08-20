@@ -61,6 +61,10 @@
                     <button v-if="!showOldUsers" class="btn btn-primary btn-sm ms-2 float-end" @click="loadPreviousBnAndNat($event)">
                         Show previous BN/NAT
                     </button>
+
+                    <button v-if="loggedInUser" class="btn btn-primary btn-sm ms-2 float-end" @click="openYourCard($event)">
+                        Open your card
+                    </button>
                 </div>
             </filter-box>
 
@@ -235,6 +239,23 @@ export default {
                 this.$store.commit('users/setUsers', res.users);
                 this.$store.dispatch('users/pageFilters/setFilterMode', '');
             }
+        },
+        async openYourCard(e) {
+            const id = this.loggedInUser.id;
+            const inList = this.users.some(u => u.id === id);
+
+            if (!inList) {
+                this.userInput = this.loggedInUser.osuId.toString();
+                await this.loadUser(e);
+            }
+
+            this.$store.commit('users/setSelectedUserId', id);
+
+            if (this.$route.query.id !== id) {
+                this.$router.replace(`/users?id=${id}`);
+            }
+
+            $('#extendedInfo').modal('show');
         },
         async openUserModal(e) {
             if (this.userInput.length) {
