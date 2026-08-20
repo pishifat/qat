@@ -31,6 +31,12 @@
                 :user="selectedEvaluation.user"
             />
 
+            <applicant-comment
+                v-if="selectedEvaluation.isResignation && selectedEvaluation.comment"
+                :comment="selectedEvaluation.comment"
+                label="Comment"
+            />
+
             <evaluation-visibility v-if="selectedEvaluation.kind ==='currentBn' && !isNatEval" />
 
             <evaluation-link />
@@ -110,6 +116,7 @@ import UserLink from '../../UserLink.vue';
 import EvaluationVisibility from './common/EvaluationVisibility.vue';
 import EvaluationMessages from './common/EvaluationMessages.vue';
 import DebugViewDocument from '../../DebugViewDocument.vue';
+import ApplicantComment from './applications/ApplicantComment.vue';
 
 export default {
     name: 'PublicEvalsInfo',
@@ -126,6 +133,7 @@ export default {
         EvaluationVisibility,
         EvaluationMessages,
         DebugViewDocument,
+        ApplicantComment,
     },
     computed: {
         ...mapState([

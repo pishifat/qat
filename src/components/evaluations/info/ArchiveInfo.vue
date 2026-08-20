@@ -30,6 +30,12 @@
                 :user="selectedEvaluation.user"
             />
 
+            <applicant-comment
+                v-if="selectedEvaluation.isResignation && selectedEvaluation.comment"
+                :comment="selectedEvaluation.comment"
+                label="Comment"
+            />
+
             <evaluation-link />
 
             <consensus />
@@ -99,6 +105,7 @@ import EvaluationLink from './common/EvaluationLink.vue';
 import UserLink from '../../UserLink.vue';
 import EvaluationMessages from './common/EvaluationMessages.vue';
 import DebugViewDocument from '../../DebugViewDocument.vue';
+import ApplicantComment from './applications/ApplicantComment.vue';
 
 export default {
     name: 'ArchiveInfo',
@@ -114,6 +121,7 @@ export default {
         UserLink,
         EvaluationMessages,
         DebugViewDocument,
+        ApplicantComment,
     },
     computed: {
         ...mapState([

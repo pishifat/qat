@@ -79,6 +79,7 @@ export interface IResignationEvaluationDocument extends IEvaluationBase, Documen
     deadline?: Date;
     kind?: string;
     length?: number;
+    comment?: string;
 }
 
 export interface IResignationEvaluationModel extends Model<IResignationEvaluationDocument> {

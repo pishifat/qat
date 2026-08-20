@@ -4,6 +4,7 @@ const Evaluation = require('./evaluation');
 const resignationEvaluationSchema = new mongoose.Schema({
     consensus: { type: String, enum: ['resignedOnGoodTerms', 'resignedOnStandardTerms'] },
     deadline: { type: Date , required: true },
+    comment: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true }, discriminatorKey: 'kind' });
 
 resignationEvaluationSchema.virtual('isResignation').get(function () {

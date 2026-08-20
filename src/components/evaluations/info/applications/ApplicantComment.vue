@@ -1,6 +1,6 @@
 <template>
     <div class="mb-2">
-        <b>Comment:</b>
+        <b>{{ label }}:</b>
         <span v-if="!comment.length" class="text-secondary">
             None...
         </span>
@@ -15,6 +15,10 @@ export default {
         comment: {
             type: String,
             default: '',
+        },
+        label: {
+            type: String,
+            default: 'Comment',
         },
     },
 };

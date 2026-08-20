@@ -1716,10 +1716,16 @@ router.post('/resignFromBn/:id', async (req, res) => {
 
     await Evaluation.deleteUserActiveEvaluations(user._id, mode);
 
+    const comment = typeof req.body.comment === 'string' ? req.body.comment.trim().slice(0, 1000) : '';
+
     let resignation = new ResignationEvaluation();
     resignation.user = user._id;
     resignation.mode = mode;
     resignation.deadline = new Date();
+
+    if (comment) {
+        resignation.comment = comment;
+    }
 
     const fields = [];
 
@@ -1745,6 +1751,13 @@ router.post('/resignFromBn/:id', async (req, res) => {
         });
 
         discordIds = discordIds.concat(assignedTrialNat.map(e => e.discordId).filter(e => e));
+    }
+
+    if (comment) {
+        fields.push({
+            name: 'Comment',
+            value: comment.length > 950 ? comment.slice(0, 950) + '... *(truncated)*' : comment,
+        });
     }
 
     await resignation.save();

@@ -77,6 +77,11 @@
                         :user="selectedEvaluation.user"
                         :show-activity-standing="true"
                     />
+                    <applicant-comment
+                        v-if="selectedEvaluation.isResignation && selectedEvaluation.comment"
+                        :comment="selectedEvaluation.comment"
+                        label="Comment"
+                    />
                 </div>
 
                 <evaluation-link />
@@ -153,6 +158,7 @@ import MainApplicationInfo from './applications/MainApplicationInfo.vue';
 import DiscussionInfo from './DiscussionInfo.vue';
 import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
 import DebugViewDocument from '../../DebugViewDocument.vue';
+import ApplicantComment from './applications/ApplicantComment.vue';
 
 export default {
     name: 'EvaluationInfo',
@@ -175,6 +181,7 @@ export default {
         EvaluationIsSecurityChecked,
         DebugViewDocument,
         AssignmentHistory,
+        ApplicantComment,
     },
     data () {
         return {
