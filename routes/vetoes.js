@@ -576,10 +576,10 @@ router.post('/selectMediators/:id', middlewares.isLoggedIn, middlewares.isNat, a
         });
     }
 
-    excludeUsers.push(veto.vetoer.username);
+    excludeUsers.push(veto.vetoer.username.toLowerCase());
 
     for (const user of veto.vouchingUsers) {
-        excludeUsers.push(user.username);
+        excludeUsers.push(user.username.toLowerCase());
     }
 
     let users = [];
