@@ -8,17 +8,28 @@
             >
                 <span v-if="mediation.vote == 2" class="text-secondary small">(partially agree)</span> <!-- only used in vetoFormat 1 and 2-->
 
-                <a
-                    v-if="loggedInUser && loggedInUser.isNatLeader"
-                    href="#"
-                    class="text-danger"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title="Reset mediation"
-                    @click.prevent="resetMediation()"
-                >
-                    <i class="fas fa-undo" />
-                </a>
+                <span v-if="loggedInUser && loggedInUser.isNatLeader">
+                    <a
+                        href="#"
+                        class="text-danger"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Reset mediation"
+                        @click.prevent="resetMediation()"
+                    >
+                        <i class="fas fa-undo" />
+                    </a>
+                    <a
+                        href="#"
+                        class="text-warning ms-1"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="Change mediator"
+                        @click.prevent="changeMediator()"
+                    >
+                        <i class="fas fa-user-edit" />
+                    </a>
+                </span>
             </user-avatar>
 
             <user-avatar
@@ -97,6 +108,30 @@ export default {
                         type: 'success',
                     });
                 }
+            }
+        },
+        async changeMediator () {
+            const currentUsername = this.mediation.mediator && this.mediation.mediator.username;
+            const username = prompt(`Replace ${currentUsername || 'this mediator'} with (username or osu ID):`);
+
+            if (!username || !username.trim()) return;
+
+            if (!confirm(`Replace ${currentUsername} with ${username.trim()} as mediator? This clears their vote and comment on every reason.`)) {
+                return;
+            }
+
+            const res = await this.$http.executePost(`/vetoes/changeMediator/${this.selectedVeto.id}`, {
+                mediationId: this.mediation.id,
+                username: username.trim(),
+            });
+
+            if (this.$http.isValid(res)) {
+                this.$store.commit('vetoes/updateVeto', res);
+
+                this.$store.dispatch('updateToastMessages', {
+                    message: 'Mediator changed!',
+                    type: 'success',
+                });
             }
         },
     },

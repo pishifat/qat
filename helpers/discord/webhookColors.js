@@ -5,7 +5,7 @@ const webhookColors = {
 
     lightOrange: 15639928,    // enableMockEvaluators, suggestionReport
     darkOrange: 7092736,      // pending badge, removeCustomPreference (genre, language, map, detail, mapper)
-    orange: 15169835,         // replaceUser, switchBnEvaluator, progressive eval assignment
+    orange: 15169835,         // replaceUser, switchBnEvaluator, progressive eval assignment, changeMediator
 
     lightYellow: 16777104,    // rejoinBnRequest, addCustomPreference (genre, language, map, detail, mapper)
     darkYellow: 7105536,      // concludeDiscussionVote, send auto activity warning

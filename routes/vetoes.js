@@ -475,6 +475,89 @@ router.post('/resetMediation/:id', middlewares.isLoggedIn, middlewares.isAdmin, 
     );
 });
 
+function mediationMediatorId(mediation) {
+    if (!mediation || !mediation.mediator) return null;
+
+    return String(mediation.mediator.id || mediation.mediator._id || mediation.mediator);
+}
+
+/* POST change mediator */
+router.post('/changeMediator/:id', middlewares.isLoggedIn, middlewares.isAdmin, async (req, res) => {
+    let veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    if (!veto) {
+        return res.json({ error: 'Veto not found' });
+    }
+
+    const mediation = veto.mediations.find(m => m._id == req.body.mediationId);
+
+    if (!mediation) {
+        return res.json({ error: 'Mediation not found' });
+    }
+
+    const newUser = await User.findByUsernameOrOsuId(req.body.username);
+
+    if (!newUser) {
+        return res.json({ error: 'User not found' });
+    }
+
+    if (!newUser.groups || !newUser.groups.some(g => g === 'bn' || g === 'nat')) {
+        return res.json({ error: 'User is not a BN or NAT' });
+    }
+
+    const oldMediatorId = mediationMediatorId(mediation);
+    const newMediatorId = String(newUser.id || newUser._id);
+
+    if (newMediatorId === oldMediatorId) {
+        return res.json({ error: 'User is already this mediator' });
+    }
+
+    if (veto.mediations.some(m => mediationMediatorId(m) === newMediatorId)) {
+        return res.json({ error: 'User is already a mediator on this veto' });
+    }
+
+    const oldUsername = mediation.mediator.username;
+    const toUpdate = veto.mediations.filter(m => mediationMediatorId(m) === oldMediatorId);
+
+    for (const m of toUpdate) {
+        m.mediator = newUser._id;
+        m.comment = undefined;
+        m.vote = undefined;
+        await m.save();
+    }
+
+    veto = await Veto
+        .findById(req.params.id)
+        .populate(
+            getPopulate(res.locals.userRequest.isNat, req.session.mongoId)
+        );
+
+    discord.webhookPost([{
+        author: discord.defaultWebhookAuthor(req.session),
+        color: discord.webhookColors.orange,
+        description: `Replaced mediator **${oldUsername}** with **${newUser.username}** for [veto for **${veto.beatmapTitle}**](https://bn.mappersguild.com/vetoes/${veto.id})`,
+    }],
+    veto.mode
+    );
+
+    if (!res.locals.userRequest.isNat) {
+        veto = sanitizeVeto(veto, req.session.mongoId, res.locals.userRequest.isNat);
+    }
+
+    res.json(veto);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Replaced mediator ${oldUsername} with ${newUser.username} for "${veto.beatmapTitle}"`,
+        'veto',
+        veto._id
+    );
+});
+
 /* POST select mediators */
 router.post('/selectMediators/:id', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
     const { mode, excludeUsers } = req.body;
