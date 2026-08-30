@@ -61,6 +61,11 @@
                 </div>
 
                 <div v-else>
+                    <risk-card
+                        v-if="showRiskUi"
+                        :result="riskResult"
+                        :loading="riskLoading"
+                    />
                     <user-activity
                         :osu-id="selectedEvaluation.user.osuId"
                         :modes="modes"
@@ -76,6 +81,7 @@
                         :is-nat="isNatEval"
                         :user="selectedEvaluation.user"
                         :show-activity-standing="true"
+                        :eval-mode="selectedEvaluation.mode"
                     />
                     <applicant-comment
                         v-if="selectedEvaluation.isResignation && selectedEvaluation.comment"
@@ -85,6 +91,19 @@
                 </div>
 
                 <evaluation-link />
+
+                <hr>
+
+                <penalty-history
+                    v-if="showRiskUi"
+                    :user-id="selectedEvaluation.user.id"
+                    :modes="[selectedEvaluation.mode]"
+                    :lock-mode="true"
+                    :initial-mode="selectedEvaluation.mode"
+                    :can-create="Boolean(loggedInUser.isNat || loggedInUser.isTrialNat)"
+                    :refresh-nonce="penaltyNonce"
+                    @changed="onPenaltyChanged"
+                />
 
                 <hr>
 
@@ -159,6 +178,8 @@ import DiscussionInfo from './DiscussionInfo.vue';
 import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
 import DebugViewDocument from '../../DebugViewDocument.vue';
 import ApplicantComment from './applications/ApplicantComment.vue';
+import RiskCard from '../../penalties/RiskCard.vue';
+import PenaltyHistory from '../../penalties/PenaltyHistory.vue';
 
 export default {
     name: 'EvaluationInfo',
@@ -182,10 +203,20 @@ export default {
         DebugViewDocument,
         AssignmentHistory,
         ApplicantComment,
+        RiskCard,
+        PenaltyHistory,
+    },
+    provide() {
+        return {
+            onPenaltyChanged: () => this.onPenaltyChanged(),
+        };
     },
     data () {
         return {
             vote: null,
+            riskResult: null,
+            riskLoading: false,
+            penaltyNonce: 0,
         };
     },
     computed: {
@@ -207,8 +238,63 @@ export default {
         isNatEval () {
             return isNatEvaluation(this.selectedEvaluation);
         },
+        showRiskUi () {
+            if (!this.selectedEvaluation || !this.loggedInUser) return false;
+            if (!this.loggedInUser.isNat && !this.loggedInUser.isTrialNat) return false;
+            if (this.selectedEvaluation.isApplication || this.isNatEval) return false;
+            if (this.selectedEvaluation.mode === 'none') return false;
+
+            return true;
+        },
+    },
+    watch: {
+        'selectedEvaluation.id': {
+            immediate: true,
+            handler() {
+                this.riskResult = null;
+                this.loadRisk();
+            },
+        },
     },
     methods: {
+        async loadRisk(options = {}) {
+            if (!this.showRiskUi) {
+                this.riskResult = null;
+
+                return;
+            }
+
+            const forceLive = Boolean(options.forceLive);
+
+            if (!forceLive && !this.selectedEvaluation.active && this.selectedEvaluation.riskSnapshot) {
+                this.riskResult = this.selectedEvaluation.riskSnapshot;
+                this.riskLoading = false;
+
+                return;
+            }
+
+            this.riskLoading = true;
+
+            const data = await this.$http.executeGet(
+                `/bnEval/risk/${this.selectedEvaluation.user.id || this.selectedEvaluation.user._id}/${this.selectedEvaluation.mode}`
+            );
+
+            if (this.$http.isValid(data) && data.level) {
+                this.riskResult = data;
+                this.$store.commit('evaluations/updateEvaluation', {
+                    ...this.selectedEvaluation,
+                    riskLevel: data.level,
+                    riskScore: data.score,
+                    limitedHistory: data.limitedHistory,
+                });
+            }
+
+            this.riskLoading = false;
+        },
+        onPenaltyChanged() {
+            this.penaltyNonce += 1;
+            this.loadRisk({ forceLive: true });
+        },
         evaluatorVibeChecked () {
             if (!this.loggedInUser.isNat) {
                 return true; // no vibe check needed for non-NAT

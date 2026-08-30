@@ -18,6 +18,8 @@ const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus, Coold
 const osuBot = require('../../helpers/osuBot');
 const Settings = require('../../models/settings');
 const { isNatEvaluation, userIsNatEvaluatorForMode } = require('../../shared/isNatEvaluation');
+const { filterAttributedResets } = require('../../helpers/nominationResetsAttribution');
+const bnRiskService = require('../../services/bnRiskService');
 
 const router = express.Router();
 
@@ -82,7 +84,7 @@ router.get('/relevantInfo', async (req, res) => {
     const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat, res.locals.userRequest.isTrialNat);
 
     // Strip reviews field for mock evaluators on active evaluations
-    const processedEvaluations = evaluations
+    let processedEvaluations = evaluations
         .filter(evaluation => {
             if (res.locals.userRequest.isTrialNat && !res.locals.userRequest.isNat) {
                 return !isNatEvaluation(evaluation);
@@ -107,9 +109,25 @@ router.get('/relevantInfo', async (req, res) => {
         return evaluation;
     });
 
+    processedEvaluations = await bnRiskService.attachRiskBadges(
+        processedEvaluations,
+        res.locals.userRequest
+    );
+
     res.json({
         evaluations: processedEvaluations,
     });
+});
+
+/* GET live evaluation risk for a BN in a mode */
+router.get('/risk/:userId/:mode', middlewares.isNatOrTrialNat, async (req, res) => {
+    const result = await bnRiskService.calculateBnRisk(req.params.userId, req.params.mode);
+
+    if (result.error) {
+        return res.json({ error: result.error });
+    }
+
+    res.json(result);
 });
 
 function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
@@ -276,6 +294,21 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
             }
 
             await er.save();
+
+            if (!isNatEval && !isResignation) {
+                try {
+                    const badge = await bnRiskService.getOrCalculateBadge(u.id, er.mode);
+
+                    if (badge) {
+                        fields.push({
+                            name: 'Evaluation risk',
+                            value: `**${badge.level}** (${badge.score}/100) ${badge.limitedHistory ? '(limited history)' : ''}`,
+                        });
+                    }
+                } catch (error) {
+                    // webhook still sends without risk
+                }
+            }
 
             await discord.webhookPost(
                 [{
@@ -629,6 +662,15 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         evaluation.archivedAt = new Date();
         await evaluation.save();
 
+        if (!isNatEvalArchive && (evaluation.isBnEvaluation || evaluation.isResignation)) {
+            const snapshot = await bnRiskService.calculateBnRisk(user.id, evaluation.mode);
+
+            if (!snapshot.error) {
+                evaluation.riskSnapshot = snapshot;
+                await evaluation.save();
+            }
+        }
+
         if (nextEval) {
             await BnEvaluation.createIfNoneActive(nextEval);
         }
@@ -751,6 +793,17 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     }
 
     await evaluation.save();
+
+    if (!isNatEvaluation(evaluation) && evaluation.mode && evaluation.user) {
+        const userId = evaluation.user.id || evaluation.user._id;
+        const result = await bnRiskService.calculateBnRisk(userId, evaluation.mode);
+
+        if (!result.error && !evaluation.active) {
+            evaluation.riskSnapshot = result;
+            await evaluation.save();
+        }
+    }
+
     res.json(evaluation);
 
     const additionText = util.makeWordFromField(evaluation.addition);
@@ -879,7 +932,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
         return { error: 'Something went wrong!' };
     }
 
-    // get base data
     let [uniqueNominations, disqualifications, pops, qualityAssuranceChecks, uniqueNominations3Months] = await Promise.all([
         Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['nominate', 'qualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['disqualify']),
@@ -898,7 +950,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.event.beatmapsetId);
 
-    // get data that requires base data
     let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
@@ -923,55 +974,10 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
         }),
     ]);
 
-    // filter nominationsPopped
-    let nominationsPopped = [];
-
-    for (const event of allNominationsPopped) {
-        if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-            let a = await Aiess
-                .find({
-                    beatmapsetId: event.beatmapsetId,
-                    timestamp: { $lt: event.timestamp },
-                    $and: [
-                        { type: { $ne: 'rank' } },
-                        { type: { $ne: 'disqualify' } },
-                        { type: { $ne: 'nomination_reset' } },
-                        { type: { $exists: true } },
-                    ],
-                })
-                .sort({ timestamp: -1 })
-                .limit(1);
-
-            if (a[0] && a[0].userId == userOsuId) {
-                nominationsPopped.push(event);
-            }
-        }
-    }
-
-    // filter nominationsDisqualified
-    let nominationsDisqualified = [];
-
-    for (const event of allNominationsDisqualified) {
-        if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-            let a = await Aiess
-                .find({
-                    beatmapsetId: event.beatmapsetId,
-                    timestamp: { $lt: event.timestamp },
-                    $and: [
-                        { type: { $ne: 'rank' } },
-                        { type: { $ne: 'disqualify' } },
-                        { type: { $ne: 'nomination_reset' } },
-                        { type: { $exists: true } },
-                    ],
-                })
-                .sort({ timestamp: -1 })
-                .limit(event.type == 'nomination_reset' ? 1 : 2);
-
-            if ((a[0] && a[0].userId == userOsuId) || (a[1] && a[1].userId == userOsuId)) {
-                nominationsDisqualified.push(event);
-            }
-        }
-    }
+    let [nominationsPopped, nominationsDisqualified] = await Promise.all([
+        filterAttributedResets(userOsuId, uniqueNominations, allNominationsPopped, { isPop: true }),
+        filterAttributedResets(userOsuId, uniqueNominations, allNominationsDisqualified, { isPop: false }),
+    ]);
 
     // filter disqualifiedQualityAssuranceChecks
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>

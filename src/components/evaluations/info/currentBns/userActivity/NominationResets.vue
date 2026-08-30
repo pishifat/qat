@@ -63,7 +63,14 @@
                             ({{ totalDrain(event.beatmaps) }})
                         </span>
                     </td>
-                    <nomination-reset-editing :event="event" />
+                    <nomination-reset-editing
+                        :event="event"
+                        :allow-add-penalty="allowAddPenalty"
+                        :user-mongo-id="userMongoId"
+                        :user-modes="userModes"
+                        :eval-mode="evalMode"
+                        :selected-activity-mode="selectedActivityMode"
+                    />
                 </tr>
             </data-table>
             <p v-else class="small ms-4">
@@ -100,6 +107,28 @@ export default {
         header: {
             type: String,
             required: true,
+        },
+        allowAddPenalty: {
+            type: Boolean,
+            default: false,
+        },
+        userMongoId: {
+            type: String,
+            default: '',
+        },
+        userModes: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        evalMode: {
+            type: String,
+            default: '',
+        },
+        selectedActivityMode: {
+            type: String,
+            default: '',
         },
     },
     data () {

@@ -23,6 +23,7 @@ const { isNatEvaluation } = require('../shared/isNatEvaluation');
 const { replaceUser } = require('../routes/evaluations/evaluations');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
 const getGeneralEvents = require('../routes/evaluations/bnEval').getGeneralEvents;
+const bnRiskService = require('../services/bnRiskService');
 
 /**
  * Beatmap report feed every hour
@@ -1196,6 +1197,33 @@ const checkTenureValidity = cron.schedule('0 0 2 * *', async () => {
     scheduled: false,
 });
 
+/**
+ * Recalculate evaluation risk for current BNs (cache safety net).
+ */
+const refreshBnEvaluationRisk = cron.schedule('0 4 * * *', async () => {
+    const users = await User.find({ groups: 'bn' });
+
+    for (const user of users) {
+        const modes = (user.modes || []).filter(mode => mode && mode !== 'none');
+
+        for (const mode of modes) {
+            try {
+                await bnRiskService.calculateBnRisk(user.id, mode);
+            } catch (error) {
+                Logger.generateError(
+                    `Failed to refresh evaluation risk for ${user.username} ${mode}`,
+                    error.stack,
+                    JSON.stringify({ userId: user.id, mode })
+                );
+            }
+        }
+
+        await util.sleep(100);
+    }
+}, {
+    scheduled: false,
+});
+
 module.exports = {
     notifyReports,
     expirePendingVetoes,
@@ -1212,4 +1240,5 @@ module.exports = {
     spawnProbationEvaluations,
     spawnHighActivityEvaluations,
     spawnLowActivityEvaluations,
+    refreshBnEvaluationRisk,
 };

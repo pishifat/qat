@@ -54,6 +54,7 @@ const debugRouter = require('./routes/debug');
 const groupHistoryRouter = require('./routes/groupHistory');
 const documentationRouter = require('./routes/documentation');
 const chartsRouter = require('./routes/charts');
+const penaltiesRouter = require('./routes/penalties');
 
 // set after all models are loaded to avoid discriminator conflicts
 mongoose.set('strictQuery', false);
@@ -157,6 +158,7 @@ apiRouter.use('/debug', debugRouter);
 apiRouter.use('/groupHistory', groupHistoryRouter);
 apiRouter.use('/docs', documentationRouter);
 apiRouter.use('/charts', chartsRouter);
+apiRouter.use('/penalties', penaltiesRouter);
 
 apiRouter.use('/v2/vetoes', vetoesV2Router);
 apiRouter.use('/v2/chatrooms', chatroomsV2Router);
@@ -260,6 +262,7 @@ webhookConfig.init().then(() => {
             automation.spawnProbationEvaluations.start();
             automation.spawnHighActivityEvaluations.start();
             automation.spawnLowActivityEvaluations.start();
+            automation.refreshBnEvaluationRisk.start();
         }
     });
 

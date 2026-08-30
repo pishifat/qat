@@ -26,6 +26,8 @@
                 :is-active="evaluation.active"
                 :is-app="evaluation.isApplication"
                 :has-mock-evaluators="evaluation.mockEvaluators && evaluation.mockEvaluators.length > 0"
+                :risk-level="evaluation.riskLevel"
+                :risk-score="evaluation.riskScore"
             />
 
             <card-footer

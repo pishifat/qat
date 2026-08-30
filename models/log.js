@@ -23,6 +23,7 @@ const logSchema = new mongoose.Schema({
             'bnFinder', // no longer used
             'notableNameChanges',
             'documentation',
+            'penalty',
         ],
     },
     relatedId: { type: 'ObjectId', ref: 'aiess' }, // if this needs to be populated for more than aiess, create dynamic refPath with category (requires some renaming)
@@ -42,13 +43,19 @@ class LogService
      * @param {string} action short comment
      * @param {string} category basically the route where it was created
      * @param {string} relatedId some ID related to the event
+     * @param {string|object} [extraInfo] optional JSON-able before/after payload
      */
-    static generate(userId, action, category, relatedId) {
+    static generate(userId, action, category, relatedId, extraInfo) {
         const log = new Log({
             user: userId,
             action,
             category,
             relatedId,
+            extraInfo: extraInfo == null
+                ? undefined
+                : typeof extraInfo === 'string'
+                    ? extraInfo
+                    : JSON.stringify(extraInfo),
         });
         log.save();
     }

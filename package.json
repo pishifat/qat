@@ -12,6 +12,7 @@
     "deploy": "npm run build && pm2 restart bn",
     "lint": "eslint .",
     "tsc": "tsc",
+    "test": "node --test tests/bnRisk/bnRiskEngine.test.js",
     "embed:cr-fingerprints": "node scripts/embedCrFingerprints.js"
   },
   "dependencies": {

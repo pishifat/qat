@@ -39,6 +39,32 @@ const Cooldown = Object.freeze({
     Extended: 'extended',
 });
 
+const PenaltyType = Object.freeze({
+    MappingQuality: 'mappingQuality',
+    ModdingQuality: 'moddingQuality',
+    Behavior: 'behavior',
+    Other: 'other',
+});
+
+const PenaltySeverity = Object.freeze({
+    Minor: 'minor',
+    Moderate: 'moderate',
+    Major: 'major',
+    Severe: 'severe',
+});
+
+const PenaltySourceType = Object.freeze({
+    None: 'none',
+    Dq: 'dq',
+    Evaluation: 'evaluation',
+});
+
+const RiskLevel = Object.freeze({
+    Low: 'LOW',
+    Medium: 'MEDIUM',
+    High: 'HIGH',
+});
+
 const VisualContentConsiderations = [
     { name: 'sexualMinors', text: 'sexual content involving or targeted at minors', active: true },
     { name: 'gore', text: 'excessive violence, gore, dismemberment, decapitation, or maiming', active: true },
@@ -69,6 +95,10 @@ module.exports = {
     BnEvaluationConsensus,
     ResignationConsensus,
     BnEvaluationAddition,
+    PenaltyType,
+    PenaltySeverity,
+    PenaltySourceType,
+    RiskLevel,
     Cooldown,
     VisualContentConsiderations,
     GenrePreferences,

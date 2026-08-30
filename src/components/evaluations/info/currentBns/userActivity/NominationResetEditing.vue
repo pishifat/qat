@@ -28,6 +28,31 @@
             </span>
             <span v-html="$md.renderInline(event.content)" />
 
+            <div
+                v-if="showAddPenalty"
+                class="mt-2"
+            >
+                <button
+                    class="btn btn-sm btn-outline-primary"
+                    type="button"
+                    @click="addingPenalty = !addingPenalty"
+                >
+                    {{ addingPenalty ? 'Cancel penalty' : 'Add penalty' }}
+                </button>
+                <penalty-form
+                    v-if="addingPenalty && userMongoId"
+                    class="mt-2"
+                    :user-id="userMongoId"
+                    :modes="penaltyModes"
+                    :lock-mode="penaltyModes.length <= 1"
+                    :initial-mode="penaltyMode"
+                    initial-source-type="dq"
+                    :initial-source-id="eventId"
+                    @saved="onPenaltySaved"
+                    @cancel="addingPenalty = false"
+                />
+            </div>
+
             <div v-if="event.qaComment" class="mt-2">
                 <b>QA comment:</b>
                 <span v-html="$md.render(event.qaComment)" />
@@ -84,23 +109,53 @@
 import { mapState } from 'vuex';
 import Impact from '../Impact.vue';
 import ObviousnessSeverity from '../ObviousnessSeverity.vue';
+import PenaltyForm from '../../../../penalties/PenaltyForm.vue';
 
 export default {
     name: 'NominationResetEditing',
     components: {
         Impact,
         ObviousnessSeverity,
+        PenaltyForm,
+    },
+    inject: {
+        onPenaltyChanged: {
+            default: null,
+        },
     },
     props: {
         event: {
             type: Object,
             required: true,
         },
+        allowAddPenalty: {
+            type: Boolean,
+            default: false,
+        },
+        userMongoId: {
+            type: String,
+            default: '',
+        },
+        userModes: {
+            type: Array,
+            default() {
+                return [];
+            },
+        },
+        evalMode: {
+            type: String,
+            default: '',
+        },
+        selectedActivityMode: {
+            type: String,
+            default: '',
+        },
     },
     data() {
         return {
             editing: false,
             newEventContent: null,
+            addingPenalty: false,
         };
     },
     computed: {
@@ -121,6 +176,35 @@ export default {
             if (total >= 4 || this.event.obviousness == 2 || this.event.severity == 3) return 'text-danger';
             else if (total >= 2) return 'text-neutral';
             else return 'text-success';
+        },
+        showAddPenalty() {
+            return this.allowAddPenalty &&
+                this.loggedInUser &&
+                this.loggedInUser.isNatOrTrialNat &&
+                this.userMongoId;
+        },
+        eventId() {
+            return this.event.id || this.event._id;
+        },
+        penaltyModes() {
+            const eventModes = Array.isArray(this.event.modes) ? this.event.modes : [];
+            const overlap = eventModes.filter(mode => this.userModes.includes(mode));
+
+            if (overlap.length) return overlap;
+            if (this.evalMode) return [this.evalMode];
+
+            return this.userModes.length ? this.userModes : ['osu'];
+        },
+        penaltyMode() {
+            if (this.selectedActivityMode && this.penaltyModes.includes(this.selectedActivityMode)) {
+                return this.selectedActivityMode;
+            }
+
+            if (this.evalMode && this.penaltyModes.includes(this.evalMode)) {
+                return this.evalMode;
+            }
+
+            return this.penaltyModes[0];
         },
     },
     watch: {
@@ -181,6 +265,13 @@ export default {
                 modifiedField: 'content',
                 value: data.reason,
             });
+        },
+        onPenaltySaved() {
+            this.addingPenalty = false;
+
+            if (typeof this.onPenaltyChanged === 'function') {
+                this.onPenaltyChanged();
+            }
         },
     },
 };

@@ -5,6 +5,7 @@ const User = require('../../models/user');
 const middlewares = require('../../helpers/middlewares');
 const util = require('../../helpers/util');
 const { isNatEvaluation } = require('../../shared/isNatEvaluation');
+const { stripRiskFields } = require('../../helpers/stripRiskFields');
 
 const router = express.Router();
 
@@ -96,6 +97,10 @@ function applyReviewVisibility(eval, viewer) {
 
     if (!viewer.isNat && !viewer.isNatLeader) {
         eval.reviews = util.shuffleArray(eval.reviews);
+    }
+
+    if (!viewer.isNatOrTrialNat) {
+        stripRiskFields(eval);
     }
 }
 

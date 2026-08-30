@@ -13,6 +13,10 @@ async function executeRequest (requestType, url, data, e, updateLoadingState, st
 
         if (requestType == 'post') {
             res = await Axios.post('/api' + url, data);
+        } else if (requestType == 'patch') {
+            res = await Axios.patch('/api' + url, data);
+        } else if (requestType == 'delete') {
+            res = await Axios.delete('/api' + url, { data });
         } else {
             res = await Axios.get('/api' + url);
         }
@@ -42,6 +46,14 @@ async function executeRequest (requestType, url, data, e, updateLoadingState, st
 const http = {
     async executePost (url, data, e) {
         return await executeRequest('post', url, data, e, false, store);
+    },
+
+    async executePatch (url, data, e) {
+        return await executeRequest('patch', url, data, e, false, store);
+    },
+
+    async executeDelete (url, data, e) {
+        return await executeRequest('delete', url, data, e, false, store);
     },
 
     async executePostMultipart (url, formData, e) {
