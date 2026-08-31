@@ -161,6 +161,8 @@ export default {
         policyFloorLabel() {
             const floor = this.result && this.result.policy && this.result.policy.floor;
 
+            if (floor === 'oneWarning') return 'one warning (30)';
+            if (floor === 'twoWarnings') return 'two warnings (60)';
             if (floor === 'highScrutiny') return 'high scrutiny (60)';
             if (floor === 'severeConcern') return 'severe concern (80)';
 

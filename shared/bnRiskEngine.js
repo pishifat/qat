@@ -43,6 +43,20 @@ function classifyLevel(score) {
     return config.RISK_LEVEL.High;
 }
 
+function evaluationDate(evaluation) {
+    if (!evaluation) return null;
+
+    return evaluation.archivedAt || evaluation.deadline || evaluation.createdAt;
+}
+
+function evaluationPositionWeight(index) {
+    const weights = config.EVALUATION_RECENCY_WEIGHTS;
+
+    if (index < weights.length) return weights[index];
+
+    return weights[weights.length - 1] || 0;
+}
+
 function idOf(doc) {
     if (!doc) return null;
     if (doc.id) return String(doc.id);
@@ -87,13 +101,18 @@ function penaltySeverityLabel(severity) {
  */
 function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = new Date() } = {}) {
     const limitedHistory = evaluations.length === 0;
+    const policyCutoff = new Date(now.getTime() - config.POLICY_WINDOW_MONTHS * MS_PER_MONTH);
+    const evaluationsInWindow = evaluations.filter((evaluation) => {
+        const at = evaluationDate(evaluation);
+
+        return at && new Date(at) >= policyCutoff;
+    });
 
     let E = 0;
     const evalContributors = [];
-    const lastThree = evaluations.slice(0, 3);
 
-    lastThree.forEach((evaluation, index) => {
-        const weight = config.EVALUATION_RECENCY_WEIGHTS[index] || 0;
+    evaluationsInWindow.forEach((evaluation, index) => {
+        const weight = evaluationPositionWeight(index);
         const outcome = isQualityBehaviorWarning(evaluation.addition)
             ? config.EVALUATION_OUTCOMES.WARNING
             : config.EVALUATION_OUTCOMES.CLEAN;
@@ -199,14 +218,9 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
     let score = 100 * (1 - (1 - E) * (1 - D) * (1 - P) * (1 - C));
     score = clamp(score, 0, 100);
 
-    const policyCutoff = new Date(now.getTime() - config.POLICY_WINDOW_MONTHS * MS_PER_MONTH);
-    const recentWarnings = evaluations.filter((evaluation) => {
-        if (!isQualityBehaviorWarning(evaluation.addition)) return false;
-
-        const at = evaluation.archivedAt || evaluation.deadline || evaluation.createdAt;
-
-        return at && new Date(at) >= policyCutoff;
-    });
+    const recentWarnings = evaluationsInWindow.filter((evaluation) => (
+        isQualityBehaviorWarning(evaluation.addition)
+    ));
 
     const typeCounts = {};
 
@@ -214,10 +228,21 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
         typeCounts[evaluation.addition] = (typeCounts[evaluation.addition] || 0) + 1;
     }
 
+    const warningCount = recentWarnings.length;
     const highScrutiny = Object.keys(typeCounts).length >= 2;
     const sameTypeWarningKick = Object.values(typeCounts).some((count) => count >= 2);
 
     let policyFloor = null;
+
+    if (warningCount >= 1) {
+        score = Math.max(score, config.ONE_WARNING_FLOOR);
+        policyFloor = 'oneWarning';
+    }
+
+    if (warningCount >= 2) {
+        score = Math.max(score, config.TWO_WARNING_FLOOR);
+        policyFloor = 'twoWarnings';
+    }
 
     if (highScrutiny) {
         score = Math.max(score, config.HIGH_SCRUTINY_FLOOR);

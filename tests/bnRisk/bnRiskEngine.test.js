@@ -82,6 +82,7 @@ describe('bnRiskEngine', () => {
         assert.equal(result.score, 45);
         assert.equal(result.level, 'MEDIUM');
         assert.equal(result.limitedHistory, false);
+        assert.equal(result.policy.floor, 'oneWarning');
         assert.ok(result.contributors.some(c => c.type === 'EVALUATION'));
     });
 
@@ -100,7 +101,64 @@ describe('bnRiskEngine', () => {
         assert.equal(result.level, 'LOW');
     });
 
-    it('does not count a fourth-oldest evaluation in E', () => {
+    it('keeps an aged warning at MEDIUM via the one-warning floor', () => {
+        const recovered = scoreBnRisk({
+            evaluations: [
+                cleanEval(1, now),
+                cleanEval(4, now),
+                warningEval(7, 'mapQualityWarning', now),
+            ],
+            now,
+        });
+
+        assert.ok(recovered.components.evaluation < 0.3);
+        assert.equal(recovered.score, 30);
+        assert.equal(recovered.level, 'MEDIUM');
+        assert.equal(recovered.policy.floor, 'oneWarning');
+    });
+
+    it('includes a 10-month-old warning that is no longer in the last three evals', () => {
+        const result = scoreBnRisk({
+            evaluations: [
+                cleanEval(1, now),
+                cleanEval(4, now),
+                cleanEval(7, now),
+                warningEval(10, 'moddingQualityWarning', now),
+            ],
+            now,
+        });
+
+        assert.equal(result.components.evaluation, 0.135);
+        assert.equal(result.score, 30);
+        assert.equal(result.level, 'MEDIUM');
+        assert.equal(result.policy.floor, 'oneWarning');
+        assert.ok(result.contributors.some(c => c.type === 'EVALUATION'));
+    });
+
+    it('ignores a warning older than 12 months', () => {
+        const asFourth = scoreBnRisk({
+            evaluations: [
+                cleanEval(1, now),
+                cleanEval(4, now),
+                cleanEval(7, now),
+                warningEval(14, 'behaviorWarning', now),
+            ],
+            now,
+        });
+        const asMostRecent = scoreBnRisk({
+            evaluations: [warningEval(14, 'behaviorWarning', now)],
+            now,
+        });
+
+        assert.equal(asFourth.score, 0);
+        assert.equal(asFourth.level, 'LOW');
+        assert.equal(asFourth.policy.floor, null);
+        assert.equal(asMostRecent.components.evaluation, 0);
+        assert.equal(asMostRecent.score, 0);
+        assert.equal(asMostRecent.policy.floor, null);
+    });
+
+    it('counts a fourth evaluation inside the 12-month window in E', () => {
         const withThree = scoreBnRisk({
             evaluations: [
                 warningEval(1, 'mapQualityWarning', now),
@@ -119,7 +177,7 @@ describe('bnRiskEngine', () => {
             now,
         });
 
-        assert.equal(withThree.components.evaluation, withFour.components.evaluation);
+        assert.ok(withFour.components.evaluation > withThree.components.evaluation);
     });
 
     it('increases risk modestly for several low-SEV DQs and more for one severe DQ', () => {
@@ -234,7 +292,7 @@ describe('bnRiskEngine', () => {
         assert.equal(result.policy.floor, 'highScrutiny');
     });
 
-    it('flags same-type warnings twice without kicking and without requiring the scrutiny floor', () => {
+    it('puts two same-type warnings at HIGH without using the high-scrutiny floor', () => {
         const result = scoreBnRisk({
             evaluations: [
                 warningEval(1, 'mapQualityWarning', now),
@@ -245,7 +303,9 @@ describe('bnRiskEngine', () => {
 
         assert.equal(result.policy.sameTypeWarningKick, true);
         assert.equal(result.policy.highScrutiny, false);
-        assert.ok(result.score < 60 || result.policy.floor !== 'highScrutiny');
+        assert.equal(result.level, 'HIGH');
+        assert.ok(result.score >= 60);
+        assert.equal(result.policy.floor, 'twoWarnings');
     });
 
     it('does not mix modes: scoring only sees the provided records', () => {
