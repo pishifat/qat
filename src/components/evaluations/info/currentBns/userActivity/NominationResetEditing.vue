@@ -46,8 +46,6 @@
                     :modes="penaltyModes"
                     :lock-mode="penaltyModes.length <= 1"
                     :initial-mode="penaltyMode"
-                    initial-source-type="dq"
-                    :initial-source-id="eventId"
                     @saved="onPenaltySaved"
                     @cancel="addingPenalty = false"
                 />
@@ -182,9 +180,6 @@ export default {
                 this.loggedInUser &&
                 this.loggedInUser.isNatOrTrialNat &&
                 this.userMongoId;
-        },
-        eventId() {
-            return this.event.id || this.event._id;
         },
         penaltyModes() {
             const eventModes = Array.isArray(this.event.modes) ? this.event.modes : [];

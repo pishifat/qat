@@ -47,20 +47,6 @@
             />
         </div>
 
-        <div class="mb-2">
-            <label class="form-label small mb-1">Linked incident (optional)</label>
-            <select v-model="form.sourceKey" class="form-select form-select-sm">
-                <option value="">None</option>
-                <option
-                    v-for="option in sourceOptions"
-                    :key="option.key"
-                    :value="option.key"
-                >
-                    {{ option.label }}
-                </option>
-            </select>
-        </div>
-
         <div class="d-flex gap-2 justify-content-end">
             <button class="btn btn-sm btn-secondary" type="button" @click="$emit('cancel')">
                 Cancel
@@ -94,14 +80,6 @@ export default {
             type: String,
             default: '',
         },
-        initialSourceType: {
-            type: String,
-            default: 'none',
-        },
-        initialSourceId: {
-            type: String,
-            default: '',
-        },
         penalty: {
             type: Object,
             default: null,
@@ -115,67 +93,17 @@ export default {
                 type: 'mappingQuality',
                 severity: 'moderate',
                 reason: '',
-                sourceKey: '',
             },
-            dqEvents: [],
-            evaluations: [],
         };
-    },
-    computed: {
-        sourceOptions() {
-            const options = [];
-
-            for (const event of this.dqEvents) {
-                const kind = event.type === 'nomination_reset' ? 'Pop' : 'DQ';
-                const date = event.timestamp ? String(event.timestamp).slice(0, 10) : '';
-
-                options.push({
-                    key: `dq:${event.id}`,
-                    label: `${kind} ${event.obviousness}/${event.severity} · ${event.artistTitle || event.beatmapsetId} (${date})`,
-                });
-            }
-
-            for (const evaluation of this.evaluations) {
-                const date = evaluation.archivedAt ? String(evaluation.archivedAt).slice(0, 10) : '';
-
-                options.push({
-                    key: `evaluation:${evaluation.id}`,
-                    label: `Eval warning · ${this.makeWordFromField(evaluation.addition)} (${date})`,
-                });
-            }
-
-            if (this.form.sourceKey && !options.some(option => option.key === this.form.sourceKey)) {
-                options.unshift({
-                    key: this.form.sourceKey,
-                    label: 'Linked incident',
-                });
-            }
-
-            return options;
-        },
-    },
-    watch: {
-        'form.mode'() {
-            this.loadLinkOptions();
-        },
     },
     mounted() {
         this.resetForm();
-        this.loadLinkOptions();
     },
     methods: {
         formatMode(mode) {
             if (mode === 'osu') return 'osu!';
 
             return 'osu!' + mode;
-        },
-        makeWordFromField(field) {
-            if (!field) return 'none';
-
-            let word = field.replace(/Bn/, 'BN');
-            word = word.replace(/([a-z])([A-Z])/g, '$1 $2');
-
-            return word.charAt(0).toUpperCase() + word.slice(1);
         },
         resetForm() {
             const fallbackMode = this.initialMode || (this.modes && this.modes[0]) || 'osu';
@@ -186,9 +114,6 @@ export default {
                     type: this.penalty.type,
                     severity: this.penalty.severity,
                     reason: this.penalty.reason,
-                    sourceKey: this.penalty.sourceType && this.penalty.sourceType !== 'none' && this.penalty.sourceId
-                        ? `${this.penalty.sourceType}:${this.penalty.sourceId}`
-                        : '',
                 };
             } else {
                 this.form = {
@@ -196,33 +121,8 @@ export default {
                     type: 'mappingQuality',
                     severity: 'moderate',
                     reason: '',
-                    sourceKey: this.initialSourceType && this.initialSourceType !== 'none' && this.initialSourceId
-                        ? `${this.initialSourceType}:${this.initialSourceId}`
-                        : '',
                 };
             }
-        },
-        async loadLinkOptions() {
-            if (!this.form.mode || !this.userId) return;
-
-            const data = await this.$http.executeGet(`/penalties/linkOptions/${this.userId}/${this.form.mode}`);
-
-            if (this.$http.isValid(data)) {
-                this.dqEvents = data.dqEvents || [];
-                this.evaluations = data.evaluations || [];
-            }
-        },
-        parseSourceKey() {
-            if (!this.form.sourceKey) {
-                return { sourceType: 'none', sourceId: null };
-            }
-
-            const [sourceType, ...rest] = this.form.sourceKey.split(':');
-
-            return {
-                sourceType,
-                sourceId: rest.join(':'),
-            };
         },
         async submit(e) {
             if (!this.form.reason || !this.form.reason.trim()) {
@@ -234,15 +134,12 @@ export default {
                 return;
             }
 
-            const source = this.parseSourceKey();
             const payload = {
                 userId: this.userId,
                 mode: this.form.mode,
                 type: this.form.type,
                 severity: this.form.severity,
                 reason: this.form.reason,
-                sourceType: source.sourceType,
-                sourceId: source.sourceId,
             };
 
             const data = this.penalty

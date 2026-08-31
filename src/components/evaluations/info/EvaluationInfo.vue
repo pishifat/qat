@@ -65,6 +65,8 @@
                         v-if="showRiskUi"
                         :result="riskResult"
                         :loading="riskLoading"
+                        :can-refresh="Boolean(selectedEvaluation.active)"
+                        @refresh="refreshRisk"
                     />
                     <user-activity
                         :osu-id="selectedEvaluation.user.osuId"
@@ -251,49 +253,53 @@ export default {
         'selectedEvaluation.id': {
             immediate: true,
             handler() {
-                this.riskResult = null;
-                this.loadRisk();
+                const snapshot = this.selectedEvaluation && this.selectedEvaluation.riskSnapshot;
+
+                this.riskResult = this.showRiskUi && snapshot && snapshot.level
+                    ? snapshot
+                    : null;
+                this.riskLoading = false;
             },
         },
     },
     methods: {
-        async loadRisk(options = {}) {
-            if (!this.showRiskUi) {
-                this.riskResult = null;
+        applyRiskResult(data) {
+            this.riskResult = data;
+            this.$store.commit('evaluations/updateEvaluation', {
+                ...this.selectedEvaluation,
+                riskSnapshot: data,
+                riskLevel: data.level,
+                riskScore: data.score,
+                limitedHistory: data.limitedHistory,
+            });
+        },
+        async refreshRisk(e) {
+            if (!this.showRiskUi || !this.selectedEvaluation.active) return;
 
-                return;
-            }
-
-            const forceLive = Boolean(options.forceLive);
-
-            if (!forceLive && !this.selectedEvaluation.active && this.selectedEvaluation.riskSnapshot) {
-                this.riskResult = this.selectedEvaluation.riskSnapshot;
-                this.riskLoading = false;
-
-                return;
-            }
+            const evalId = this.selectedEvaluation.id;
 
             this.riskLoading = true;
 
-            const data = await this.$http.executeGet(
-                `/bnEval/risk/${this.selectedEvaluation.user.id || this.selectedEvaluation.user._id}/${this.selectedEvaluation.mode}`
+            const data = await this.$http.executePost(
+                `/bnEval/refreshRisk/${evalId}`,
+                {},
+                e
             );
 
+            if (!this.selectedEvaluation || this.selectedEvaluation.id !== evalId) return;
+
             if (this.$http.isValid(data) && data.level) {
-                this.riskResult = data;
-                this.$store.commit('evaluations/updateEvaluation', {
-                    ...this.selectedEvaluation,
-                    riskLevel: data.level,
-                    riskScore: data.score,
-                    limitedHistory: data.limitedHistory,
-                });
+                this.applyRiskResult(data);
             }
 
             this.riskLoading = false;
         },
         onPenaltyChanged() {
             this.penaltyNonce += 1;
-            this.loadRisk({ forceLive: true });
+
+            if (this.selectedEvaluation.active) {
+                this.refreshRisk();
+            }
         },
         evaluatorVibeChecked () {
             if (!this.loggedInUser.isNat) {

@@ -1,90 +1,109 @@
 <template>
-    <div v-if="result" class="card border-secondary mb-3">
+    <div class="card border-secondary mb-3">
         <div class="card-body">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                <b>Evaluation Risk</b>
-                <span
-                    class="badge rounded-pill"
-                    :class="levelBadgeClass"
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <b>Evaluation Risk</b>
+                    <span
+                        v-if="result"
+                        class="badge rounded-pill risk-level-badge"
+                        :class="levelBadgeClass"
+                    >
+                        {{ result.level }}
+                        <span v-if="result.limitedHistory" class="ms-1">· LIMITED HISTORY</span>
+                    </span>
+                </div>
+                <button
+                    v-if="canRefresh"
+                    class="btn btn-sm btn-secondary"
+                    type="button"
+                    :disabled="loading"
+                    @click="$emit('refresh', $event)"
                 >
-                    {{ result.level }}
-                    <span v-if="result.limitedHistory" class="ms-1">· LIMITED HISTORY</span>
-                </span>
+                    {{ refreshButtonLabel }}
+                </button>
             </div>
 
-            <p class="mb-1 mt-2">
-                <span class="fs-4">{{ result.score }}</span>
-                <span class="text-secondary"> / 100</span>
-            </p>
+            <template v-if="result">
+                <p class="mb-1 mt-2">
+                    <span class="fs-4">{{ result.score }}</span>
+                    <span class="text-secondary"> / 100</span>
+                </p>
 
-            <ul v-if="policyMessages.length" class="small mb-2 ps-3">
-                <li
-                    v-for="message in policyMessages"
-                    :key="message"
-                    class="text-warning"
-                >
-                    {{ message }}
-                </li>
-            </ul>
-
-            <div v-if="result.contributors && result.contributors.length">
-                <div class="small text-secondary">Main signals</div>
-                <ul class="small mb-2 ps-3">
+                <ul v-if="policyMessages.length" class="small mb-2 ps-3">
                     <li
-                        v-for="contributor in result.contributors.slice(0, 5)"
-                        :key="contributor.type + contributor.id"
+                        v-for="message in policyMessages"
+                        :key="message"
+                        class="text-warning"
                     >
-                        {{ contributor.label }}
+                        {{ message }}
                     </li>
                 </ul>
-            </div>
-            <p v-else class="small text-secondary mb-2">
-                No recent evidence of elevated concern.
-            </p>
 
-            <p v-if="result.guidance" class="small mb-2">
-                <b>Evaluator guidance</b><br>
-                {{ result.guidance }}
-            </p>
+                <div v-if="result.contributors && result.contributors.length">
+                    <div class="small text-secondary">Main signals</div>
+                    <ul class="small mb-2 ps-3">
+                        <li
+                            v-for="contributor in result.contributors.slice(0, 5)"
+                            :key="contributor.type + contributor.id"
+                        >
+                            {{ contributor.label }}
+                        </li>
+                    </ul>
+                </div>
+                <p v-else class="small text-secondary mb-2">
+                    No recent evidence of elevated concern.
+                </p>
 
-            <p class="mb-0">
-                <a :href="'#' + collapseId" data-bs-toggle="collapse">
-                    Risk breakdown <i class="fas fa-angle-down" />
-                </a>
+                <p v-if="result.guidance" class="small mb-2">
+                    <b>Evaluator guidance</b><br>
+                    {{ result.guidance }}
+                </p>
+
+                <p class="mb-0">
+                    <a :href="'#' + collapseId" data-bs-toggle="collapse">
+                        Risk breakdown <i class="fas fa-angle-down" />
+                    </a>
+                </p>
+                <div :id="collapseId" class="collapse mt-2 pt-2">
+                    <div
+                        v-for="row in componentRows"
+                        :key="row.key"
+                        class="mb-2"
+                    >
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-secondary">{{ row.label }}</span>
+                            <span class="risk-value">{{ row.display }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div
+                                class="progress-bar"
+                                :class="row.barClass"
+                                :style="{ width: row.pct + '%' }"
+                            />
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between small pt-2 mt-1">
+                        <span class="text-secondary">Policy floor</span>
+                        <span :class="policyFloorClass">{{ policyFloorLabel }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between small mt-1">
+                        <span class="text-secondary">Final score</span>
+                        <span class="risk-value" :class="levelTextClass">{{ result.score }}</span>
+                    </div>
+                </div>
+            </template>
+            <p v-else-if="loading" class="small text-secondary mb-0 mt-2">
+                Calculating evaluation risk...
             </p>
-            <div :id="collapseId" class="collapse mt-2 pt-2">
-                <div
-                    v-for="row in componentRows"
-                    :key="row.key"
-                    class="mb-2"
-                >
-                    <div class="d-flex justify-content-between small mb-1">
-                        <span class="text-secondary">{{ row.label }}</span>
-                        <span class="risk-value">{{ row.display }}</span>
-                    </div>
-                    <div class="progress" style="height: 6px;">
-                        <div
-                            class="progress-bar"
-                            :class="row.barClass"
-                            :style="{ width: row.pct + '%' }"
-                        />
-                    </div>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between small pt-2 mt-1">
-                    <span class="text-secondary">Policy floor</span>
-                    <span :class="policyFloorClass">{{ policyFloorLabel }}</span>
-                </div>
-                <div class="d-flex justify-content-between small mt-1">
-                    <span class="text-secondary">Final score</span>
-                    <span class="risk-value" :class="levelTextClass">{{ result.score }}</span>
-                </div>
-            </div>
+            <p v-else class="small text-secondary mb-0 mt-2">
+                {{ canRefresh
+                    ? 'Risk has not been calculated for this evaluation.'
+                    : 'Risk was not calculated for this evaluation.' }}
+            </p>
         </div>
     </div>
-    <p v-else-if="loading" class="small text-secondary">
-        Loading evaluation risk...
-    </p>
 </template>
 
 <script>
@@ -99,7 +118,12 @@ export default {
             type: Boolean,
             default: false,
         },
+        canRefresh: {
+            type: Boolean,
+            default: false,
+        },
     },
+    emits: ['refresh'],
     computed: {
         levelBadgeClass() {
             const level = this.result && this.result.level;
@@ -165,6 +189,11 @@ export default {
                 pct: row.value == null ? 0 : Math.min(100, (Number(row.value) / scale) * 100),
             }));
         },
+        refreshButtonLabel() {
+            if (this.loading) return this.result ? 'Updating...' : 'Calculating...';
+
+            return this.result ? 'Update' : 'Calculate';
+        },
         collapseId() {
             const stamp = this.result && this.result.calculatedAt
                 ? String(this.result.calculatedAt).replace(/[^0-9]/g, '')
@@ -186,6 +215,12 @@ export default {
 <style scoped>
 .risk-value {
     font-variant-numeric: tabular-nums;
+}
+
+.risk-level-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.2em 0.55em;
 }
 
 .progress {

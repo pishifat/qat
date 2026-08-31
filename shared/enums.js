@@ -53,12 +53,6 @@ const PenaltySeverity = Object.freeze({
     Severe: 'severe',
 });
 
-const PenaltySourceType = Object.freeze({
-    None: 'none',
-    Dq: 'dq',
-    Evaluation: 'evaluation',
-});
-
 const RiskLevel = Object.freeze({
     Low: 'LOW',
     Medium: 'MEDIUM',
@@ -97,7 +91,6 @@ module.exports = {
     BnEvaluationAddition,
     PenaltyType,
     PenaltySeverity,
-    PenaltySourceType,
     RiskLevel,
     Cooldown,
     VisualContentConsiderations,

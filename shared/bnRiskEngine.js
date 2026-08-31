@@ -156,9 +156,7 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
         const createdAt = penalty.createdAt;
         const weight = recencyWeight(ageInMonths(createdAt, now));
         const base = config.PENALTY_WEIGHTS[penalty.severity] || 0;
-        const linked = penalty.sourceType && penalty.sourceType !== 'none' && penalty.sourceId;
-        const linkMultiplier = linked ? config.LINKED_PENALTY_MULTIPLIER : 1;
-        const impact = base * weight * linkMultiplier;
+        const impact = base * weight;
 
         if (new Date(createdAt) >= recurrenceCutoff) nRecent += 1;
 

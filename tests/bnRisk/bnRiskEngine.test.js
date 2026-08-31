@@ -27,13 +27,11 @@ function cleanEval(monthsAgoValue, now) {
     };
 }
 
-function penalty({ severity = 'moderate', type = 'mappingQuality', months = 0, sourceType = 'none', sourceId = null, now }) {
+function penalty({ severity = 'moderate', type = 'mappingQuality', months = 0, now }) {
     return {
         id: `p-${severity}-${months}`,
         severity,
         type,
-        sourceType,
-        sourceId,
         createdAt: monthsAgo(months, now),
     };
 }
@@ -216,39 +214,6 @@ describe('bnRiskEngine', () => {
         assert.equal(repeatedSevere.policy.activeSevereConcern, true);
         assert.equal(repeatedSevere.policy.floor, 'severeConcern');
         assert.ok(repeatedSevere.score >= 80);
-    });
-
-    it('applies 50% contribution to a linked penalty versus an unlinked one', () => {
-        const unlinked = scoreBnRisk({
-            penalties: [penalty({ severity: 'major', months: 0, sourceType: 'none', now })],
-            now,
-        });
-        const linked = scoreBnRisk({
-            penalties: [penalty({
-                severity: 'major',
-                months: 0,
-                sourceType: 'dq',
-                sourceId: 'abc',
-                now,
-            })],
-            now,
-        });
-
-        assert.ok(linked.components.penalty < unlinked.components.penalty);
-        assert.ok(Math.abs(linked.components.penalty * 2 - unlinked.components.penalty) < 0.0001);
-    });
-
-    it('does not apply the link reduction when sourceType is none', () => {
-        const result = scoreBnRisk({
-            penalties: [penalty({ severity: 'major', months: 0, sourceType: 'none', sourceId: 'abc', now })],
-            now,
-        });
-        const baseline = scoreBnRisk({
-            penalties: [penalty({ severity: 'major', months: 0, now })],
-            now,
-        });
-
-        assert.equal(result.score, baseline.score);
     });
 
     it('applies a high-scrutiny floor of 60 for two different warning types in 12 months', () => {

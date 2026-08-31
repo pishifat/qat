@@ -70,18 +70,6 @@ const userSchema = new mongoose.Schema({
     lastActivityCheck: { type: Date },
     countryCode: { type: String },
 
-    evaluationRiskCache: {
-        type: [{
-            _id: false,
-            mode: { type: String, enum: ['osu', 'taiko', 'catch', 'mania'], required: true },
-            score: { type: Number },
-            level: { type: String, enum: ['LOW', 'MEDIUM', 'HIGH'] },
-            limitedHistory: { type: Boolean },
-            calculatedAt: { type: Date },
-        }],
-        select: false,
-    },
-
     /* temporary fields for qa leaderboard webhook */
     recentQaChecks: { type: Number },
     allQaChecks: { type: Number },

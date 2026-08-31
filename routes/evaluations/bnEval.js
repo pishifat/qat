@@ -109,7 +109,7 @@ router.get('/relevantInfo', async (req, res) => {
         return evaluation;
     });
 
-    processedEvaluations = await bnRiskService.attachRiskBadges(
+    processedEvaluations = bnRiskService.attachRiskBadges(
         processedEvaluations,
         res.locals.userRequest
     );
@@ -119,9 +119,22 @@ router.get('/relevantInfo', async (req, res) => {
     });
 });
 
-/* GET live evaluation risk for a BN in a mode */
-router.get('/risk/:userId/:mode', middlewares.isNatOrTrialNat, async (req, res) => {
-    const result = await bnRiskService.calculateBnRisk(req.params.userId, req.params.mode);
+/* POST recalculate and persist evaluation risk for one eval */
+router.post('/refreshRisk/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const evaluation = await Evaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    if (!evaluation.active) {
+        return res.json({ error: 'Archived evaluations keep their original risk snapshot' });
+    }
+
+    if (!bnRiskService.shouldCalculateEvalRisk(evaluation)) {
+        return res.json({ error: 'Risk is not calculated for this evaluation' });
+    }
+
+    const result = await bnRiskService.calculateAndStoreForEvaluation(evaluation);
 
     if (result.error) {
         return res.json({ error: result.error });
@@ -295,16 +308,10 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
 
             await er.save();
 
-            if (!isNatEval && !isResignation) {
+            if (bnRiskService.shouldCalculateEvalRisk(er)) {
                 try {
-                    const badge = await bnRiskService.getOrCalculateBadge(u.id, er.mode);
-
-                    if (badge) {
-                        fields.push({
-                            name: 'Evaluation risk',
-                            value: `**${badge.level}** (${badge.score}/100) ${badge.limitedHistory ? '(limited history)' : ''}`,
-                        });
-                    }
+                    const result = await bnRiskService.calculateAndStoreForEvaluation(er);
+                    fields.push(...bnRiskService.riskWebhookFields(result));
                 } catch (error) {
                     // webhook still sends without risk
                 }
@@ -327,7 +334,10 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         }
     }
 
-    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    const evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
 
     res.json({
         evaluations,
@@ -405,7 +415,10 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     }
 
     await setGroupEval(evaluations, req.session, res.locals.userRequest);
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
@@ -432,7 +445,10 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
 
     res.json(evaluations);
     Logger.generate(
@@ -662,15 +678,6 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         evaluation.archivedAt = new Date();
         await evaluation.save();
 
-        if (!isNatEvalArchive && (evaluation.isBnEvaluation || evaluation.isResignation)) {
-            const snapshot = await bnRiskService.calculateBnRisk(user.id, evaluation.mode);
-
-            if (!snapshot.error) {
-                evaluation.riskSnapshot = snapshot;
-                await evaluation.save();
-            }
-        }
-
         if (nextEval) {
             await BnEvaluation.createIfNoneActive(nextEval);
         }
@@ -722,7 +729,10 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         if (resetSession) await util.invalidateSessions(user.id);
     }
 
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
 
     res.json(evaluations);
     Logger.generate(
@@ -793,16 +803,6 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     }
 
     await evaluation.save();
-
-    if (!isNatEvaluation(evaluation) && evaluation.mode && evaluation.user) {
-        const userId = evaluation.user.id || evaluation.user._id;
-        const result = await bnRiskService.calculateBnRisk(userId, evaluation.mode);
-
-        if (!result.error && !evaluation.active) {
-            evaluation.riskSnapshot = result;
-            await evaluation.save();
-        }
-    }
 
     res.json(evaluation);
 

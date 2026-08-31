@@ -14,12 +14,6 @@ const penaltySchema = new mongoose.Schema({
         required: true,
     },
     reason: { type: String, required: true },
-    sourceType: {
-        type: String,
-        enum: ['none', 'dq', 'evaluation'],
-        default: 'none',
-    },
-    sourceId: { type: 'ObjectId' },
     createdBy: { type: 'ObjectId', ref: 'User', required: true },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 

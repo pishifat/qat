@@ -1,43 +1,67 @@
+const Evaluation = require('../models/evaluations/evaluation');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Penalty = require('../models/penalty');
 const User = require('../models/user');
 const Aiess = require('../models/aiess');
 const { isNatEvaluation } = require('../shared/isNatEvaluation');
 const { scoreBnRisk } = require('../shared/bnRiskEngine');
-const { WARNING_ADDITIONS, DQ_MAX_AGE_MONTHS, CACHE_MAX_AGE_MS, GAMEPLAY_MODES } = require('../shared/bnRiskConfig');
+const { GAMEPLAY_MODES } = require('../shared/bnRiskConfig');
 const { getAttributedNominationResets } = require('../helpers/nominationResetsAttribution');
 const { stripRiskFields } = require('../helpers/stripRiskFields');
-
-const MONTH_MS = 1000 * 60 * 60 * 24 * 30.4375;
 
 function isGameplayMode(mode) {
     return GAMEPLAY_MODES.includes(mode);
 }
 
-function cacheEntry(result, mode) {
-    return {
-        mode,
-        score: result.score,
-        level: result.level,
-        limitedHistory: result.limitedHistory,
-        calculatedAt: result.calculatedAt ? new Date(result.calculatedAt) : new Date(),
-    };
+/** Same lookback as UserActivity: deadline − (activityToCheck + 7), default 90 + 7. */
+function evalActivityWindow(evaluation = {}) {
+    const maxDate = evaluation.deadline ? new Date(evaluation.deadline) : new Date();
+    const days = evaluation.activityToCheck ? evaluation.activityToCheck + 7 : 90 + 7;
+    const minDate = new Date(maxDate);
+    minDate.setDate(minDate.getDate() - days);
+
+    return { minDate, maxDate };
 }
 
-async function writeUserCache(userId, mode, result) {
-    const user = await User.findById(userId).select('+evaluationRiskCache');
+function userIdOf(user) {
+    if (!user) return null;
+    if (user.id) return user.id;
+    if (user._id) return user._id;
 
-    if (!user) return;
+    return user;
+}
 
-    const cache = Array.isArray(user.evaluationRiskCache) ? [...user.evaluationRiskCache] : [];
-    const index = cache.findIndex(entry => entry.mode === mode);
-    const entry = cacheEntry(result, mode);
+function decorateRiskFields(obj) {
+    const snapshot = obj && obj.riskSnapshot;
 
-    if (index === -1) cache.push(entry);
-    else cache[index] = entry;
+    if (snapshot && snapshot.level) {
+        obj.riskLevel = snapshot.level;
+        obj.riskScore = snapshot.score;
+        obj.limitedHistory = snapshot.limitedHistory;
+    }
 
-    user.evaluationRiskCache = cache;
-    await user.save();
+    return obj;
+}
+
+function riskWebhookFields(result) {
+    if (!result || result.error || !result.level) return [];
+
+    return [{
+        name: 'Evaluation risk',
+        value: `**${result.level}** (${result.score}/100)${result.limitedHistory ? ' (limited history)' : ''}`,
+    }];
+}
+
+function hasStoredRisk(evaluation) {
+    return Boolean(evaluation && evaluation.riskSnapshot && evaluation.riskSnapshot.level);
+}
+
+function shouldCalculateEvalRisk(evaluation) {
+    if (!evaluation || evaluation.isApplication) return false;
+    if (!isGameplayMode(evaluation.mode)) return false;
+    if (isNatEvaluation(evaluation)) return false;
+
+    return true;
 }
 
 /**
@@ -45,22 +69,28 @@ async function writeUserCache(userId, mode, result) {
  * @param {string} mode
  * @returns {Promise<object>}
  */
-async function calculateBnRisk(userId, mode) {
+async function calculateBnRisk(userId, mode, options = {}) {
     if (!isGameplayMode(mode)) {
         return { error: 'Invalid mode' };
     }
 
     const user = await User.findById(userId).orFail();
     const now = new Date();
-    const minDate = new Date(now.getTime() - DQ_MAX_AGE_MONTHS * MONTH_MS);
+    const { minDate, maxDate } = evalActivityWindow(options);
+
+    const query = {
+        user: userId,
+        mode,
+        active: false,
+        consensus: { $exists: true },
+    };
+
+    if (options.excludeEvalId) {
+        query._id = { $ne: options.excludeEvalId };
+    }
 
     const evaluations = await BnEvaluation
-        .find({
-            user: userId,
-            mode,
-            active: false,
-            consensus: { $exists: true },
-        })
+        .find(query)
         .populate('user', 'username osuId modesInfo groups')
         .sort({ archivedAt: -1, createdAt: -1 });
 
@@ -68,7 +98,7 @@ async function calculateBnRisk(userId, mode) {
 
     const [penalties, resets] = await Promise.all([
         Penalty.find({ user: userId, mode }).sort({ createdAt: -1 }),
-        getAttributedNominationResets(user.osuId, [mode], minDate, now),
+        getAttributedNominationResets(user.osuId, [mode], minDate, maxDate),
     ]);
 
     const dqEvents = [
@@ -76,88 +106,73 @@ async function calculateBnRisk(userId, mode) {
         ...(resets.nominationsPopped || []),
     ];
 
-    const result = scoreBnRisk({
+    return scoreBnRisk({
         evaluations: bnEvaluations,
         dqEvents,
         penalties,
         now,
     });
+}
 
-    await writeUserCache(userId, mode, result);
+async function storeOnActiveBnEval(userId, mode, result) {
+    if (!result || result.error) return;
+
+    await Evaluation.updateMany(
+        {
+            user: userId,
+            mode,
+            active: true,
+            kind: { $in: ['currentBn', 'resignation'] },
+        },
+        { $set: { riskSnapshot: result } }
+    );
+}
+
+async function recalculateActiveBnEval(userId, mode) {
+    const evaluations = await Evaluation.find({
+        user: userId,
+        mode,
+        active: true,
+        kind: { $in: ['currentBn', 'resignation'] },
+    });
+
+    let result = null;
+
+    for (const evaluation of evaluations) {
+        result = await calculateAndStoreForEvaluation(evaluation);
+    }
+
+    return result || calculateBnRisk(userId, mode);
+}
+
+async function calculateAndStoreForEvaluation(evaluation) {
+    if (!evaluation || !evaluation.active) {
+        return { error: 'Archived evaluations keep their original risk snapshot' };
+    }
+
+    const userId = userIdOf(evaluation.user);
+    const result = await calculateBnRisk(userId, evaluation.mode, {
+        excludeEvalId: evaluation._id || evaluation.id,
+        deadline: evaluation.deadline,
+        activityToCheck: evaluation.activityToCheck,
+    });
+
+    if (result.error) return result;
+
+    evaluation.riskSnapshot = result;
+
+    if (typeof evaluation.markModified === 'function') {
+        evaluation.markModified('riskSnapshot');
+    }
+
+    if (typeof evaluation.save === 'function') {
+        await evaluation.save();
+    }
 
     return result;
 }
 
-function getCachedRisk(user, mode) {
-    const cache = user && user.evaluationRiskCache;
-    if (!cache || !cache.length) return null;
-
-    const entry = cache.find(item => item.mode === mode);
-    if (!entry || !entry.calculatedAt) return null;
-
-    if (Date.now() - new Date(entry.calculatedAt).getTime() > CACHE_MAX_AGE_MS) {
-        return null;
-    }
-
-    return entry;
-}
-
-/**
- * @param {string} userId
- * @param {string} mode
- * @returns {Promise<{ score: number, level: string, limitedHistory: boolean }|null>}
- */
-async function getOrCalculateBadge(userId, mode) {
-    const user = await User.findById(userId).select('+evaluationRiskCache');
-    const cached = getCachedRisk(user, mode);
-
-    if (cached) {
-        return {
-            score: cached.score,
-            level: cached.level,
-            limitedHistory: cached.limitedHistory,
-        };
-    }
-
-    const result = await calculateBnRisk(userId, mode);
-
-    if (result.error) return null;
-
-    return {
-        score: result.score,
-        level: result.level,
-        limitedHistory: result.limitedHistory,
-    };
-}
-
-async function calculateBnRiskForUserModes(userId, modes) {
-    const gameplayModes = (modes || []).filter(isGameplayMode);
-    const results = [];
-
-    for (const mode of gameplayModes) {
-        results.push(await calculateBnRisk(userId, mode));
-    }
-
-    return results;
-}
-
-async function listWarningEvaluations(userId, mode, limit = 15) {
-    const evaluations = await BnEvaluation
-        .find({
-            user: userId,
-            mode,
-            active: false,
-            consensus: { $exists: true },
-            addition: { $in: [...WARNING_ADDITIONS] },
-        })
-        .populate('user', 'username osuId modesInfo groups')
-        .sort({ archivedAt: -1, createdAt: -1 })
-        .limit(limit);
-
-    return evaluations.filter(evaluation => !isNatEvaluation(evaluation));
-}
-
-async function attachRiskBadges(evaluations, viewer) {
+function attachRiskBadges(evaluations, viewer) {
     if (!viewer || !viewer.isNatOrTrialNat) {
         return evaluations.map((evaluation) => {
             const obj = evaluation && evaluation.toObject ? evaluation.toObject() : evaluation;
@@ -166,28 +181,11 @@ async function attachRiskBadges(evaluations, viewer) {
         });
     }
 
-    return Promise.all(evaluations.map(async (evaluation) => {
+    return evaluations.map((evaluation) => {
         const obj = evaluation && evaluation.toObject ? evaluation.toObject() : { ...evaluation };
-        const skip = obj.isApplication || isNatEvaluation(evaluation) || !isGameplayMode(obj.mode);
-        const user = evaluation.user || obj.user;
-        const userId = user && (user.id || user._id);
 
-        if (!skip && userId) {
-            try {
-                const badge = await getOrCalculateBadge(userId, obj.mode);
-
-                if (badge) {
-                    obj.riskLevel = badge.level;
-                    obj.riskScore = badge.score;
-                    obj.limitedHistory = badge.limitedHistory;
-                }
-            } catch (error) {
-                // listing still succeeds if a single risk calc fails
-            }
-        }
-
-        return obj;
-    }));
+        return decorateRiskFields(obj);
+    });
 }
 
 async function recalcForAiessEvent(event) {
@@ -212,7 +210,7 @@ async function recalcForAiessEvent(event) {
     for (const user of users) {
         for (const mode of modes) {
             if (isGameplayMode(mode)) {
-                await calculateBnRisk(user.id, mode);
+                await recalculateActiveBnEval(user.id, mode);
             }
         }
     }
@@ -220,10 +218,12 @@ async function recalcForAiessEvent(event) {
 
 module.exports = {
     calculateBnRisk,
-    getOrCalculateBadge,
-    getCachedRisk,
-    calculateBnRiskForUserModes,
-    listWarningEvaluations,
+    calculateAndStoreForEvaluation,
+    storeOnActiveBnEval,
+    recalculateActiveBnEval,
+    riskWebhookFields,
+    hasStoredRisk,
+    shouldCalculateEvalRisk,
     attachRiskBadges,
     recalcForAiessEvent,
     isGameplayMode,

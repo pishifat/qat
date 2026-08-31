@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const Penalty = require('../models/penalty');
 const User = require('../models/user');
 const Logger = require('../models/log');
@@ -7,16 +6,12 @@ const middlewares = require('../helpers/middlewares');
 const discord = require('../helpers/discord');
 const util = require('../helpers/util');
 const bnRiskService = require('../services/bnRiskService');
-const { getAttributedNominationResets } = require('../helpers/nominationResetsAttribution');
-const { DQ_MAX_AGE_MONTHS } = require('../shared/bnRiskConfig');
-const { PenaltyType, PenaltySeverity, PenaltySourceType } = require('../shared/enums');
+const { PenaltyType, PenaltySeverity } = require('../shared/enums');
 
 const router = express.Router();
 
 router.use(middlewares.isLoggedIn);
 router.use(middlewares.isNatOrTrialNat);
-
-const MONTH_MS = 1000 * 60 * 60 * 24 * 30.4375;
 
 const defaultPopulate = [
     { path: 'createdBy', select: 'username osuId' },
@@ -25,7 +20,6 @@ const defaultPopulate = [
 
 const TYPE_VALUES = Object.values(PenaltyType);
 const SEVERITY_VALUES = Object.values(PenaltySeverity);
-const SOURCE_VALUES = Object.values(PenaltySourceType);
 
 function canEditPenalty(viewer, penalty) {
     if (!viewer) return false;
@@ -76,19 +70,6 @@ function penaltyWebhook(session, color, action, penalty) {
     }], penalty.mode);
 }
 
-function parseSource(body) {
-    const sourceType = SOURCE_VALUES.includes(body.sourceType) ? body.sourceType : PenaltySourceType.None;
-    let sourceId = body.sourceId || null;
-
-    if (sourceType === PenaltySourceType.None) {
-        sourceId = null;
-    } else if (sourceId && !mongoose.Types.ObjectId.isValid(sourceId)) {
-        return { error: 'Invalid linked incident' };
-    }
-
-    return { sourceType, sourceId };
-}
-
 /* GET penalties for a user */
 router.get('/user/:userId', async (req, res) => {
     const query = { user: req.params.userId };
@@ -111,50 +92,6 @@ router.get('/user/:userId', async (req, res) => {
     });
 });
 
-/* GET optional DQ/pop and warning-eval links for the create/edit form */
-router.get('/linkOptions/:userId/:mode', async (req, res) => {
-    const { userId, mode } = req.params;
-
-    if (!bnRiskService.isGameplayMode(mode)) {
-        return res.json({ error: 'Invalid mode' });
-    }
-
-    const user = await User.findById(userId).orFail();
-    const now = new Date();
-    const minDate = new Date(now.getTime() - DQ_MAX_AGE_MONTHS * MONTH_MS);
-
-    const [resets, warningEvaluations] = await Promise.all([
-        getAttributedNominationResets(user.osuId, [mode], minDate, now),
-        bnRiskService.listWarningEvaluations(userId, mode),
-    ]);
-
-    const dqEvents = [
-        ...(resets.nominationsDisqualified || []),
-        ...(resets.nominationsPopped || []),
-    ].filter(event =>
-        (event.obviousness || event.obviousness == 0) &&
-        (event.severity || event.severity == 0)
-    );
-
-    res.json({
-        dqEvents: dqEvents.map(event => ({
-            id: event.id || event._id,
-            type: event.type,
-            timestamp: event.timestamp,
-            obviousness: event.obviousness,
-            severity: event.severity,
-            artistTitle: event.artistTitle,
-            beatmapsetId: event.beatmapsetId,
-        })),
-        evaluations: warningEvaluations.map(evaluation => ({
-            id: evaluation.id,
-            addition: evaluation.addition,
-            archivedAt: evaluation.archivedAt,
-            consensus: evaluation.consensus,
-        })),
-    });
-});
-
 /* POST create penalty */
 router.post('/', async (req, res) => {
     const { userId, mode, type, severity, reason } = req.body;
@@ -171,10 +108,6 @@ router.post('/', async (req, res) => {
         return res.json({ error: 'Invalid type or severity' });
     }
 
-    const source = parseSource(req.body);
-
-    if (source.error) return res.json({ error: source.error });
-
     await User.findById(userId).orFail();
 
     const penalty = await Penalty.create({
@@ -183,20 +116,18 @@ router.post('/', async (req, res) => {
         type,
         severity,
         reason: String(reason).trim(),
-        sourceType: source.sourceType,
-        sourceId: source.sourceId,
         createdBy: res.locals.userRequest.id,
     });
 
     await penalty.populate(defaultPopulate);
-    await bnRiskService.calculateBnRisk(userId, mode);
+    await bnRiskService.recalculateActiveBnEval(userId, mode);
 
     Logger.generate(
         req.session.mongoId,
         `Created ${severity} ${type} penalty for user ${userId} (${mode})`,
         'penalty',
         penalty._id,
-        { after: { mode, type, severity, reason: penalty.reason, sourceType: source.sourceType, sourceId: source.sourceId } }
+        { after: { mode, type, severity, reason: penalty.reason } }
     );
 
     res.json({
@@ -223,8 +154,6 @@ router.patch('/:id', async (req, res) => {
         type: penalty.type,
         severity: penalty.severity,
         reason: penalty.reason,
-        sourceType: penalty.sourceType,
-        sourceId: penalty.sourceId,
     };
 
     if (req.body.mode) {
@@ -259,18 +188,6 @@ router.patch('/:id', async (req, res) => {
         penalty.reason = String(req.body.reason).trim();
     }
 
-    if (req.body.sourceType !== undefined || req.body.sourceId !== undefined) {
-        const source = parseSource({
-            sourceType: req.body.sourceType !== undefined ? req.body.sourceType : penalty.sourceType,
-            sourceId: req.body.sourceId !== undefined ? req.body.sourceId : penalty.sourceId,
-        });
-
-        if (source.error) return res.json({ error: source.error });
-
-        penalty.sourceType = source.sourceType;
-        penalty.sourceId = source.sourceId;
-    }
-
     await penalty.save();
     await penalty.populate(defaultPopulate);
 
@@ -278,7 +195,7 @@ router.patch('/:id', async (req, res) => {
     const modesToRecalc = new Set([before.mode, penalty.mode]);
 
     for (const mode of modesToRecalc) {
-        await bnRiskService.calculateBnRisk(userId, mode);
+        await bnRiskService.recalculateActiveBnEval(userId, mode);
     }
 
     Logger.generate(
@@ -291,8 +208,6 @@ router.patch('/:id', async (req, res) => {
             type: penalty.type,
             severity: penalty.severity,
             reason: penalty.reason,
-            sourceType: penalty.sourceType,
-            sourceId: penalty.sourceId,
         } }
     );
 
@@ -325,12 +240,10 @@ router.delete('/:id', middlewares.isNatLeader, async (req, res) => {
         type: penalty.type,
         severity: penalty.severity,
         reason: penalty.reason,
-        sourceType: penalty.sourceType,
-        sourceId: penalty.sourceId,
     };
 
     await penalty.deleteOne();
-    await bnRiskService.calculateBnRisk(userId, mode);
+    await bnRiskService.recalculateActiveBnEval(userId, mode);
 
     Logger.generate(
         req.session.mongoId,

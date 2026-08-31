@@ -26,8 +26,6 @@
                     :modes="modes"
                     :lock-mode="lockMode"
                     :initial-mode="initialMode || (modes[0] || '')"
-                    :initial-source-type="initialSourceType"
-                    :initial-source-id="initialSourceId"
                     @saved="onCreated"
                     @cancel="showForm = false"
                 />
@@ -119,14 +117,6 @@ export default {
         canCreate: {
             type: Boolean,
             default: false,
-        },
-        initialSourceType: {
-            type: String,
-            default: 'none',
-        },
-        initialSourceId: {
-            type: String,
-            default: '',
         },
         startOpen: {
             type: Boolean,

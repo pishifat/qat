@@ -56,13 +56,6 @@ interface IUser {
     isActiveContentReviewer: boolean;
     lastActivityCheck: Date;
     countryCode?: string;
-    evaluationRiskCache?: {
-        mode: string;
-        score: number;
-        level: string;
-        limitedHistory: boolean;
-        calculatedAt: Date;
-    }[];
 
     // not used in model
     genreCount: number;

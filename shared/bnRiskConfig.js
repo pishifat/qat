@@ -22,7 +22,6 @@ const PENALTY_SCALING_FACTOR = 80;
 const PENALTY_RECURRENCE_DAYS = 90;
 const PENALTY_RECURRENCE_STEP = 0.25;
 const PENALTY_RECURRENCE_CAP = 1.75;
-const LINKED_PENALTY_MULTIPLIER = 0.5;
 
 const HIGH_SCRUTINY_FLOOR = 60;
 const SEVERE_CONCERN_FLOOR = 80;
@@ -70,8 +69,6 @@ const RISK_GUIDANCE = Object.freeze({
 
 const GAMEPLAY_MODES = Object.freeze(['osu', 'taiko', 'catch', 'mania']);
 
-const CACHE_MAX_AGE_MS = 25 * 60 * 60 * 1000;
-
 module.exports = {
     RISK_LEVEL,
     RISK_LOW_MAX,
@@ -87,7 +84,6 @@ module.exports = {
     PENALTY_RECURRENCE_DAYS,
     PENALTY_RECURRENCE_STEP,
     PENALTY_RECURRENCE_CAP,
-    LINKED_PENALTY_MULTIPLIER,
     HIGH_SCRUTINY_FLOOR,
     SEVERE_CONCERN_FLOOR,
     EVALUATION_RECENCY_WEIGHTS,
@@ -97,5 +93,4 @@ module.exports = {
     SEV_WEIGHTS,
     RISK_GUIDANCE,
     GAMEPLAY_MODES,
-    CACHE_MAX_AGE_MS,
 };

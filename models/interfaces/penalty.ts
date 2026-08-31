@@ -7,8 +7,6 @@ export interface IPenaltyDocument extends Document {
     type: string;
     severity: string;
     reason: string;
-    sourceType: string;
-    sourceId?: any;
     createdBy: IUserDocument;
     createdAt?: Date;
     updatedAt?: Date;

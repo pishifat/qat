@@ -262,7 +262,6 @@ webhookConfig.init().then(() => {
             automation.spawnProbationEvaluations.start();
             automation.spawnHighActivityEvaluations.start();
             automation.spawnLowActivityEvaluations.start();
-            automation.refreshBnEvaluationRisk.start();
         }
     });
 

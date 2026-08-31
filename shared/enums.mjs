@@ -54,12 +54,6 @@ export const PenaltySeverity = Object.freeze({
     Severe: 'severe',
 });
 
-export const PenaltySourceType = Object.freeze({
-    None: 'none',
-    Dq: 'dq',
-    Evaluation: 'evaluation',
-});
-
 export const RiskLevel = Object.freeze({
     Low: 'LOW',
     Medium: 'MEDIUM',
@@ -99,7 +93,6 @@ const enums = {
     BnEvaluationAddition,
     PenaltyType,
     PenaltySeverity,
-    PenaltySourceType,
     RiskLevel,
     Cooldown,
     VisualContentConsiderations,

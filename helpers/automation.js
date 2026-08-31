@@ -630,6 +630,20 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             generateWebhook = true;
         }
 
+        let assignmentRisk = null;
+        const missingRisk = !bnRiskService.hasStoredRisk(eval);
+
+        if (
+            bnRiskService.shouldCalculateEvalRisk(eval)
+            && (!hasAssignedNatEvaluators || (generateWebhook && missingRisk))
+        ) {
+            try {
+                assignmentRisk = await bnRiskService.calculateAndStoreForEvaluation(eval);
+            } catch (error) {
+                // webhook still sends without risk
+            }
+        }
+
         // send webhooks
         if (generateWebhook) {
             let evaluators = await Settings.getModeHasTrialNat(eval.mode) && !isNatEval ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
@@ -655,6 +669,8 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                     });
                 }
             }
+
+            fields.push(...bnRiskService.riskWebhookFields(assignmentRisk || eval.riskSnapshot));
 
             // evaluation status webhook
             await discord.webhookPost(
@@ -1197,33 +1213,6 @@ const checkTenureValidity = cron.schedule('0 0 2 * *', async () => {
     scheduled: false,
 });
 
-/**
- * Recalculate evaluation risk for current BNs (cache safety net).
- */
-const refreshBnEvaluationRisk = cron.schedule('0 4 * * *', async () => {
-    const users = await User.find({ groups: 'bn' });
-
-    for (const user of users) {
-        const modes = (user.modes || []).filter(mode => mode && mode !== 'none');
-
-        for (const mode of modes) {
-            try {
-                await bnRiskService.calculateBnRisk(user.id, mode);
-            } catch (error) {
-                Logger.generateError(
-                    `Failed to refresh evaluation risk for ${user.username} ${mode}`,
-                    error.stack,
-                    JSON.stringify({ userId: user.id, mode })
-                );
-            }
-        }
-
-        await util.sleep(100);
-    }
-}, {
-    scheduled: false,
-});
-
 module.exports = {
     notifyReports,
     expirePendingVetoes,
@@ -1240,5 +1229,4 @@ module.exports = {
     spawnProbationEvaluations,
     spawnHighActivityEvaluations,
     spawnLowActivityEvaluations,
-    refreshBnEvaluationRisk,
 };
