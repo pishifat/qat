@@ -432,10 +432,13 @@ describe('bnRiskEngine', () => {
     });
 
     it('looks up interpolated SEV weights', () => {
-        assert.equal(getSevBase(0, 2), 2);
-        assert.equal(getSevBase(0, 3), 4);
-        assert.equal(getSevBase(1, 3), 11);
-        assert.equal(getSevBase(2, 3), 16);
+        assert.equal(getSevBase(0, 1), 1);
+        assert.equal(getSevBase(0, 3), 6);
+        assert.equal(getSevBase(1, 1), 6);
+        assert.equal(getSevBase(1, 3), 18);
+        assert.equal(getSevBase(2, 0), 2);
+        assert.equal(getSevBase(2, 1), 9);
+        assert.equal(getSevBase(2, 3), 27);
         assert.equal(getSevBase(null, 2), 0);
     });
 });
