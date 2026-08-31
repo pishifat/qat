@@ -83,7 +83,6 @@
                         :is-nat="isNatEval"
                         :user="selectedEvaluation.user"
                         :show-activity-standing="true"
-                        :eval-mode="selectedEvaluation.mode"
                     />
                     <applicant-comment
                         v-if="selectedEvaluation.isResignation && selectedEvaluation.comment"
@@ -207,11 +206,6 @@ export default {
         ApplicantComment,
         RiskCard,
         PenaltyHistory,
-    },
-    provide() {
-        return {
-            onPenaltyChanged: () => this.onPenaltyChanged(),
-        };
     },
     data () {
         return {

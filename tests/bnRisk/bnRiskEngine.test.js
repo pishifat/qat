@@ -154,6 +154,8 @@ describe('bnRiskEngine', () => {
 
         assert.equal(asDq.score, asPop.score);
         assert.ok(asPop.contributors[0].label.includes('pop'));
+        assert.equal(asPop.contributors[0].obviousness, 2);
+        assert.equal(asPop.contributors[0].severity, 2);
     });
 
     it('gives unscored DQs zero contribution', () => {

@@ -132,6 +132,8 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
             type: 'DQ',
             id: idOf(event),
             label: `SEV ${event.obviousness}/${event.severity} ${event.type === 'nomination_reset' ? 'pop' : 'DQ'}`,
+            obviousness: event.obviousness,
+            severity: event.severity,
             impact,
             _raw: impact,
         });
@@ -255,6 +257,7 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
             id: c.id,
             label: c.label,
             impact: round4(c.impact),
+            ...(c.obviousness != null ? { obviousness: c.obviousness, severity: c.severity } : {}),
         })),
         guidance: config.RISK_GUIDANCE[level],
     };

@@ -44,10 +44,15 @@
                     <div class="small text-secondary">Main signals</div>
                     <ul class="small mb-2 ps-3">
                         <li
-                            v-for="contributor in result.contributors.slice(0, 5)"
-                            :key="contributor.type + contributor.id"
+                            v-for="signal in mainSignals"
+                            :key="signal.type + signal.id"
                         >
-                            {{ contributor.label }}
+                            <template v-if="signal.sev">
+                                SEV <span :class="sevColorClass(signal.sev)">{{ signal.sev.obviousness }}/{{ signal.sev.severity }}</span>{{ signal.rest }}
+                            </template>
+                            <template v-else>
+                                {{ signal.label }}
+                            </template>
                         </li>
                     </ul>
                 </div>
@@ -201,12 +206,53 @@ export default {
 
             return 'riskBreakdown-' + stamp;
         },
+        mainSignals() {
+            const contributors = (this.result && this.result.contributors) || [];
+
+            return contributors.slice(0, 5).map((contributor) => {
+                const sev = this.parseSev(contributor);
+                const rest = sev && contributor.label
+                    ? String(contributor.label).replace(/^SEV \d+\/\d+/, '')
+                    : '';
+
+                return {
+                    ...contributor,
+                    sev,
+                    rest,
+                };
+            });
+        },
     },
     methods: {
         formatComponent(value) {
             if (value === null || value === undefined) return '—';
 
             return Number(value).toFixed(2);
+        },
+        parseSev(contributor) {
+            if (contributor.obviousness != null && contributor.severity != null) {
+                return {
+                    obviousness: contributor.obviousness,
+                    severity: contributor.severity,
+                };
+            }
+
+            const match = contributor.label && String(contributor.label).match(/^SEV (\d+)\/(\d+)/);
+
+            if (!match) return null;
+
+            return {
+                obviousness: Number(match[1]),
+                severity: Number(match[2]),
+            };
+        },
+        sevColorClass(sev) {
+            const total = Number(sev.obviousness) + Number(sev.severity);
+
+            if (total >= 4 || Number(sev.obviousness) == 2 || Number(sev.severity) == 3) return 'text-danger';
+            if (total >= 2) return 'text-neutral';
+
+            return 'text-success';
         },
     },
 };

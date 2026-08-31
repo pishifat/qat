@@ -43,21 +43,11 @@
                 :events="filterEvents(nominationsDisqualified, selectedMode)"
                 :events-id="'nominationsDisqualified'"
                 :header="'Nominations disqualified'"
-                :allow-add-penalty="true"
-                :user-mongo-id="mongoId"
-                :user-modes="activityModes"
-                :eval-mode="evalMode"
-                :selected-activity-mode="selectedMode"
             />
             <nomination-resets
                 :events="filterEvents(nominationsPopped, selectedMode)"
                 :events-id="'nominationsPopped'"
                 :header="'Nominations popped'"
-                :allow-add-penalty="true"
-                :user-mongo-id="mongoId"
-                :user-modes="activityModes"
-                :eval-mode="evalMode"
-                :selected-activity-mode="selectedMode"
             />
             <nomination-resets
                 :events="filterEvents(disqualifications, selectedMode)"
@@ -233,10 +223,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        evalMode: {
-            type: String,
-            default: '',
-        },
     },
     data() {
         return {
@@ -262,13 +248,6 @@ export default {
             'mockBnEvaluations',
             'isLoading',
         ]),
-        activityModes() {
-            if (Array.isArray(this.modes)) {
-                return this.modes.filter(mode => mode && mode !== 'none');
-            }
-
-            return this.modes && this.modes !== 'none' ? [this.modes] : [];
-        },
     },
     watch: {
         unique() {
