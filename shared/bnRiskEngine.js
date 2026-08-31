@@ -43,6 +43,57 @@ function classifyLevel(score) {
     return config.RISK_LEVEL.High;
 }
 
+function mapperKey(nomination) {
+    if (!nomination) return null;
+    if (nomination.creatorId != null) return String(nomination.creatorId);
+    if (nomination.creatorName) return String(nomination.creatorName).toLowerCase();
+
+    return null;
+}
+
+function mapperVarietyStats(nominations = []) {
+    const uniqueNominations = nominations.length;
+    const mappers = new Set();
+
+    for (const nomination of nominations) {
+        const key = mapperKey(nomination);
+
+        if (key) mappers.add(key);
+    }
+
+    const uniqueMappers = mappers.size;
+    const percent = uniqueNominations > 0 && uniqueMappers > 0
+        ? (uniqueMappers / uniqueNominations) * 100
+        : null;
+
+    return { percent, uniqueMappers, uniqueNominations };
+}
+
+function varietyBand(mode) {
+    if (mode && mode !== 'osu') {
+        return {
+            start: config.VARIETY_START_OTHER,
+            peak: config.VARIETY_PEAK_OTHER,
+        };
+    }
+
+    return {
+        start: config.VARIETY_START_OSU,
+        peak: config.VARIETY_PEAK_OSU,
+    };
+}
+
+function varietyComponent(percent, mode) {
+    if (percent == null) return 0;
+
+    const { start, peak } = varietyBand(mode);
+
+    if (percent >= start) return 0;
+    if (percent <= peak) return config.VARIETY_COMPONENT_CAP;
+
+    return config.VARIETY_COMPONENT_CAP * (start - percent) / (start - peak);
+}
+
 function evaluationDate(evaluation) {
     if (!evaluation) return null;
 
@@ -96,10 +147,12 @@ function penaltySeverityLabel(severity) {
  * @param {Array} input.evaluations archived currentBn evals in this mode, newest first, NAT evals already excluded
  * @param {Array} input.dqEvents attributed DQs and pops ({ _id/id, timestamp, obviousness, severity, type, artistTitle })
  * @param {Array} input.penalties this mode's penalties
+ * @param {Array} input.nominations unique nominations in the eval activity window ({ creatorId, creatorName })
+ * @param {string} [input.mode]
  * @param {Date} [input.now]
  * @returns {object}
  */
-function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = new Date() } = {}) {
+function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], nominations = [], mode = 'osu', now = new Date() } = {}) {
     const limitedHistory = evaluations.length === 0;
     const policyCutoff = new Date(now.getTime() - config.POLICY_WINDOW_MONTHS * MS_PER_MONTH);
     const evaluationsInWindow = evaluations.filter((evaluation) => {
@@ -213,9 +266,22 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
         }
     }
 
-    const C = 0;
+    const varietyStats = mapperVarietyStats(nominations);
+    const V = varietyComponent(varietyStats.percent, mode);
+    const varietyContributors = [];
 
-    let score = 100 * (1 - (1 - E) * (1 - D) * (1 - P) * (1 - C));
+    if (V > 0) {
+        const percentLabel = Math.round(varietyStats.percent);
+
+        varietyContributors.push({
+            type: 'VARIETY',
+            id: 'mapper-variety',
+            label: `Mapper variety ${percentLabel}%`,
+            impact: V,
+        });
+    }
+
+    let score = 100 * (1 - (1 - E) * (1 - D) * (1 - P) * (1 - V));
     score = clamp(score, 0, 100);
 
     const recentWarnings = evaluationsInWindow.filter((evaluation) => (
@@ -257,7 +323,7 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
     score = Math.round(clamp(score, 0, 100));
 
     const level = classifyLevel(score);
-    const contributors = [...evalContributors, ...dqContributors, ...penaltyContributors]
+    const contributors = [...evalContributors, ...dqContributors, ...penaltyContributors, ...varietyContributors]
         .sort((a, b) => b.impact - a.impact);
 
     return {
@@ -269,7 +335,12 @@ function scoreBnRisk({ evaluations = [], dqEvents = [], penalties = [], now = ne
             evaluation: round4(E),
             dq: round4(D),
             penalty: round4(P),
-            conduct: C,
+            variety: round4(V),
+        },
+        mapperVariety: {
+            percent: varietyStats.percent == null ? null : round4(varietyStats.percent),
+            uniqueMappers: varietyStats.uniqueMappers,
+            uniqueNominations: varietyStats.uniqueNominations,
         },
         policy: {
             highScrutiny,
@@ -300,4 +371,6 @@ module.exports = {
     isQualityBehaviorWarning,
     classifyLevel,
     clamp,
+    mapperVarietyStats,
+    varietyComponent,
 };

@@ -36,6 +36,19 @@ function penalty({ severity = 'moderate', type = 'mappingQuality', months = 0, n
     };
 }
 
+function nominationsForMappers(mapperCount, total = 10) {
+    const nominations = [];
+
+    for (let i = 0; i < total; i++) {
+        nominations.push({
+            beatmapsetId: i + 1,
+            creatorId: (i % mapperCount) + 1,
+        });
+    }
+
+    return nominations;
+}
+
 function dq({ obviousness, severity, months = 0, type = 'disqualify', now }) {
     return {
         id: `dq-${obviousness}-${severity}-${months}`,
@@ -55,7 +68,7 @@ describe('bnRiskEngine', () => {
         assert.equal(result.level, 'LOW');
         assert.equal(result.score, 0);
         assert.equal(result.limitedHistory, true);
-        assert.equal(result.components.conduct, 0);
+        assert.equal(result.components.variety, 0);
         assert.equal(result.policy.highScrutiny, false);
         assert.equal(result.policy.sameTypeWarningKick, false);
     });
@@ -322,14 +335,86 @@ describe('bnRiskEngine', () => {
         assert.equal(taiko.score, 0);
     });
 
-    it('always reports conduct as 0', () => {
-        const result = scoreBnRisk({
-            evaluations: [warningEval(1, 'behaviorWarning', now)],
-            penalties: [penalty({ severity: 'severe', type: 'behavior', months: 0, now })],
+    it('does not raise variety risk at or above the start of the band', () => {
+        const osu = scoreBnRisk({
+            nominations: nominationsForMappers(7, 10),
+            mode: 'osu',
+            now,
+        });
+        const taiko = scoreBnRisk({
+            nominations: nominationsForMappers(6, 10),
+            mode: 'taiko',
             now,
         });
 
-        assert.equal(result.components.conduct, 0);
+        assert.equal(osu.mapperVariety.percent, 70);
+        assert.equal(osu.components.variety, 0);
+        assert.equal(osu.score, 0);
+        assert.equal(taiko.mapperVariety.percent, 60);
+        assert.equal(taiko.components.variety, 0);
+    });
+
+    it('ramps variety risk from the start of the band down to the peak', () => {
+        const osuMid = scoreBnRisk({
+            nominations: nominationsForMappers(6, 10),
+            mode: 'osu',
+            now,
+        });
+        const osuPeak = scoreBnRisk({
+            nominations: nominationsForMappers(5, 10),
+            mode: 'osu',
+            now,
+        });
+        const osuBelowPeak = scoreBnRisk({
+            nominations: nominationsForMappers(4, 10),
+            mode: 'osu',
+            now,
+        });
+
+        assert.equal(osuMid.mapperVariety.percent, 60);
+        assert.equal(osuMid.components.variety, 0.05);
+        assert.equal(osuMid.score, 5);
+        assert.equal(osuPeak.components.variety, config.VARIETY_COMPONENT_CAP);
+        assert.equal(osuPeak.score, 10);
+        assert.equal(osuBelowPeak.components.variety, osuPeak.components.variety);
+        assert.ok(osuPeak.contributors.some(c => c.type === 'VARIETY' && c.label.includes('50%')));
+    });
+
+    it('uses a 60–40 variety band for non-osu modes', () => {
+        const taikoMid = scoreBnRisk({
+            nominations: nominationsForMappers(5, 10),
+            mode: 'taiko',
+            now,
+        });
+        const taikoPeak = scoreBnRisk({
+            nominations: nominationsForMappers(4, 10),
+            mode: 'mania',
+            now,
+        });
+
+        assert.equal(taikoMid.mapperVariety.percent, 50);
+        assert.equal(taikoMid.components.variety, 0.05);
+        assert.equal(taikoPeak.mapperVariety.percent, 40);
+        assert.equal(taikoPeak.components.variety, config.VARIETY_COMPONENT_CAP);
+    });
+
+    it('does not let mapper variety dominate other risk factors', () => {
+        const varietyOnly = scoreBnRisk({
+            nominations: nominationsForMappers(5, 10),
+            mode: 'osu',
+            now,
+        });
+        const warningAndVariety = scoreBnRisk({
+            evaluations: [warningEval(1, 'mapQualityWarning', now)],
+            nominations: nominationsForMappers(5, 10),
+            mode: 'osu',
+            now,
+        });
+
+        assert.equal(varietyOnly.level, 'LOW');
+        assert.ok(warningAndVariety.score > 45);
+        assert.ok(warningAndVariety.score < 55);
+        assert.equal(warningAndVariety.level, 'MEDIUM');
     });
 
     it('caps the penalty component', () => {

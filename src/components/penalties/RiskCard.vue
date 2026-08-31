@@ -184,12 +184,16 @@ export default {
         componentRows() {
             const components = (this.result && this.result.components) || {};
             const scale = 0.4;
+            const variety = this.result && this.result.mapperVariety;
+            const varietyLabel = variety && variety.percent != null
+                ? `Mapper variety (${Math.round(variety.percent)}%)`
+                : 'Mapper variety';
 
             return [
                 { key: 'evaluation', label: 'Evaluation history', value: components.evaluation, barClass: 'bg-info' },
                 { key: 'dq', label: 'DQ history', value: components.dq, barClass: 'bg-warning' },
                 { key: 'penalty', label: 'Penalty history', value: components.penalty, barClass: 'bg-danger' },
-                { key: 'conduct', label: 'Conduct', value: components.conduct, barClass: 'bg-secondary' },
+                { key: 'variety', label: varietyLabel, value: components.variety ?? 0, barClass: 'bg-secondary' },
             ].map(row => ({
                 ...row,
                 display: this.formatComponent(row.value),

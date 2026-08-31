@@ -110,6 +110,8 @@ async function calculateBnRisk(userId, mode, options = {}) {
         evaluations: bnEvaluations,
         dqEvents,
         penalties,
+        nominations: resets.uniqueNominations || [],
+        mode,
         now,
     });
 }
