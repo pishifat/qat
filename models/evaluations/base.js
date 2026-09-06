@@ -28,6 +28,7 @@ const baseSchema = {
         type: { type: String, enum: ['automatic', 'manual'] },
     }],
     mockReviews: [{ type: 'ObjectId', ref: 'Review' }],
+    riskSnapshot: { type: Object },
 };
 
 module.exports = baseSchema;

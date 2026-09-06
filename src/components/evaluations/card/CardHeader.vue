@@ -54,6 +54,14 @@
                 title="visible in public archives"
                 class="fas fa-globe-americas ms-2 text-success"
             />
+            <i
+                v-if="isNatOrTrialNat && !isApp && !isNatEvaluation && (riskLevel || isActive)"
+                class="ms-2"
+                :class="riskIconClass"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                :title="riskIconTitle"
+            />
         </p>
         <div v-if="consensus">
             Consensus:
@@ -148,6 +156,34 @@ export default {
         hasMockEvaluators: {
             type: Boolean,
             default: false,
+        },
+        riskLevel: {
+            type: String,
+            default: '',
+        },
+        riskScore: {
+            type: Number,
+            default: null,
+        },
+    },
+    computed: {
+        riskIconClass() {
+            if (this.riskLevel === 'HIGH') return 'fas fa-flag text-danger';
+            if (this.riskLevel === 'MEDIUM') return 'fas fa-flag text-warning';
+            if (this.riskLevel === 'LOW') return 'fas fa-flag text-success';
+
+            return 'fas fa-flag text-secondary';
+        },
+        riskIconTitle() {
+            if (!this.riskLevel) return 'Evaluation risk not calculated';
+
+            const level = this.riskLevel.charAt(0) + this.riskLevel.slice(1).toLowerCase();
+
+            if (this.riskScore != null) {
+                return `${level} evaluation risk · ${this.riskScore}/100`;
+            }
+
+            return `${level} evaluation risk`;
         },
     },
 };

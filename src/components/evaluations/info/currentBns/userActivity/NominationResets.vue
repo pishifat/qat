@@ -63,7 +63,9 @@
                             ({{ totalDrain(event.beatmaps) }})
                         </span>
                     </td>
-                    <nomination-reset-editing :event="event" />
+                    <nomination-reset-editing
+                        :event="event"
+                    />
                 </tr>
             </data-table>
             <p v-else class="small ms-4">

@@ -23,6 +23,7 @@ const { isNatEvaluation } = require('../shared/isNatEvaluation');
 const { replaceUser } = require('../routes/evaluations/evaluations');
 const { BnEvaluationConsensus, BnEvaluationAddition } = require('../shared/enums');
 const getGeneralEvents = require('../routes/evaluations/bnEval').getGeneralEvents;
+const bnRiskService = require('../services/bnRiskService');
 
 /**
  * Beatmap report feed every hour
@@ -629,6 +630,20 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             generateWebhook = true;
         }
 
+        let assignmentRisk = null;
+        const missingRisk = !bnRiskService.hasStoredRisk(eval);
+
+        if (
+            bnRiskService.shouldCalculateEvalRisk(eval)
+            && (!hasAssignedNatEvaluators || (generateWebhook && missingRisk))
+        ) {
+            try {
+                assignmentRisk = await bnRiskService.calculateAndStoreForEvaluation(eval);
+            } catch (error) {
+                // webhook still sends without risk
+            }
+        }
+
         // send webhooks
         if (generateWebhook) {
             let evaluators = await Settings.getModeHasTrialNat(eval.mode) && !isNatEval ? eval.natEvaluators.concat(eval.bnEvaluators) : eval.natEvaluators;
@@ -654,6 +669,8 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                     });
                 }
             }
+
+            fields.push(...bnRiskService.riskWebhookFields(assignmentRisk || eval.riskSnapshot));
 
             // evaluation status webhook
             await discord.webhookPost(

@@ -94,6 +94,8 @@
                 />
                 <hr>
                 <notes />
+                <hr>
+                <user-penalties :refresh-nonce="penaltyNonce" />
             </div>
 
             <debug-view-document
@@ -109,6 +111,7 @@ import { mapGetters, mapState } from 'vuex';
 import ModalHeader from './info/ModalHeader.vue';
 import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
+import UserPenalties from './info/UserPenalties.vue';
 import DiscordId from './info/DiscordId.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
 import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
@@ -131,6 +134,7 @@ export default {
         ModalHeader,
         Duration,
         Notes,
+        UserPenalties,
         DiscordId,
         NextEvaluation,
         BnEvaluatorToggle,
@@ -157,6 +161,18 @@ export default {
         documentTitle() {
             return this.selectedUser ? `${this.selectedUser.username}'s Profile` : '';
         },
+    },
+    data() {
+        return {
+            penaltyNonce: 0,
+        };
+    },
+    provide() {
+        return {
+            onPenaltyChanged: () => {
+                this.penaltyNonce += 1;
+            },
+        };
     },
     methods: {
         getUserLastHistoryDate() {

@@ -18,6 +18,8 @@ const { BnEvaluationConsensus, BnEvaluationAddition, ResignationConsensus, Coold
 const osuBot = require('../../helpers/osuBot');
 const Settings = require('../../models/settings');
 const { isNatEvaluation, userIsNatEvaluatorForMode } = require('../../shared/isNatEvaluation');
+const { filterAttributedResets } = require('../../helpers/nominationResetsAttribution');
+const bnRiskService = require('../../services/bnRiskService');
 
 const router = express.Router();
 
@@ -82,7 +84,7 @@ router.get('/relevantInfo', async (req, res) => {
     const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, res.locals.userRequest.isNat, res.locals.userRequest.isTrialNat);
 
     // Strip reviews field for mock evaluators on active evaluations
-    const processedEvaluations = evaluations
+    let processedEvaluations = evaluations
         .filter(evaluation => {
             if (res.locals.userRequest.isTrialNat && !res.locals.userRequest.isNat) {
                 return !isNatEvaluation(evaluation);
@@ -107,8 +109,60 @@ router.get('/relevantInfo', async (req, res) => {
         return evaluation;
     });
 
+    processedEvaluations = bnRiskService.attachRiskBadges(
+        processedEvaluations,
+        res.locals.userRequest
+    );
+
     res.json({
         evaluations: processedEvaluations,
+    });
+});
+
+/* POST recalculate and persist evaluation risk for one eval */
+router.post('/refreshRisk/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const evaluation = await Evaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    if (!evaluation.active) {
+        return res.json({ error: 'Archived evaluations keep their original risk snapshot' });
+    }
+
+    if (!bnRiskService.shouldCalculateEvalRisk(evaluation)) {
+        return res.json({ error: 'Risk is not calculated for this evaluation' });
+    }
+
+    const result = await bnRiskService.calculateAndStoreForEvaluation(evaluation);
+
+    if (result.error) {
+        return res.json({ error: result.error });
+    }
+
+    res.json(result);
+});
+
+/* POST recalculate risk for all active BN/resignation evals */
+router.post('/refreshAllActiveRisk', middlewares.isNatLeader, async (req, res) => {
+    const summary = await bnRiskService.refreshAllActiveEvaluations();
+
+    Logger.generate(
+        req.session.mongoId,
+        `Recalculated evaluation risk for ${summary.updated} active BN eval(s)`,
+        'bnEvaluation',
+        undefined,
+        summary
+    );
+
+    const parts = [`Updated ${summary.updated}`];
+
+    if (summary.skipped) parts.push(`skipped ${summary.skipped}`);
+    if (summary.failed) parts.push(`failed ${summary.failed}`);
+
+    res.json({
+        ...summary,
+        success: `${parts.join(', ')} of ${summary.total} active BN evals`,
     });
 });
 
@@ -277,6 +331,15 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
 
             await er.save();
 
+            if (bnRiskService.shouldCalculateEvalRisk(er)) {
+                try {
+                    const result = await bnRiskService.calculateAndStoreForEvaluation(er);
+                    fields.push(...bnRiskService.riskWebhookFields(result));
+                } catch (error) {
+                    // webhook still sends without risk
+                }
+            }
+
             await discord.webhookPost(
                 [{
                     author: discord.defaultWebhookAuthor(req.session),
@@ -294,7 +357,10 @@ router.post('/addEvaluations/', middlewares.isNat, async (req, res) => {
         }
     }
 
-    const evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    const evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
 
     res.json({
         evaluations,
@@ -372,7 +438,10 @@ router.post('/setGroupEval/', middlewares.isNat, async (req, res) => {
     }
 
     await setGroupEval(evaluations, req.session, res.locals.userRequest);
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
     res.json(evaluations);
     Logger.generate(
         req.session.mongoId,
@@ -399,7 +468,10 @@ router.post('/setIndividualEval/', middlewares.isNat, async (req, res) => {
         discussion: false,
     });
 
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
 
     res.json(evaluations);
     Logger.generate(
@@ -680,7 +752,10 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
         if (resetSession) await util.invalidateSessions(user.id);
     }
 
-    evaluations = await Evaluation.findActiveEvaluations(res.locals.userRequest, true);
+    evaluations = bnRiskService.attachRiskBadges(
+        await Evaluation.findActiveEvaluations(res.locals.userRequest, true),
+        res.locals.userRequest
+    );
 
     res.json(evaluations);
     Logger.generate(
@@ -751,6 +826,7 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     }
 
     await evaluation.save();
+
     res.json(evaluation);
 
     const additionText = util.makeWordFromField(evaluation.addition);
@@ -879,7 +955,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
         return { error: 'Something went wrong!' };
     }
 
-    // get base data
     let [uniqueNominations, disqualifications, pops, qualityAssuranceChecks, uniqueNominations3Months] = await Promise.all([
         Aiess.getUniqueUserEvents(userOsuId, minDate, maxDate, modes, ['nominate', 'qualify']),
         Aiess.getUserEvents(userOsuId, minDate, maxDate, modes, ['disqualify']),
@@ -898,7 +973,6 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.event.beatmapsetId);
 
-    // get data that requires base data
     let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
@@ -923,55 +997,10 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
         }),
     ]);
 
-    // filter nominationsPopped
-    let nominationsPopped = [];
-
-    for (const event of allNominationsPopped) {
-        if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-            let a = await Aiess
-                .find({
-                    beatmapsetId: event.beatmapsetId,
-                    timestamp: { $lt: event.timestamp },
-                    $and: [
-                        { type: { $ne: 'rank' } },
-                        { type: { $ne: 'disqualify' } },
-                        { type: { $ne: 'nomination_reset' } },
-                        { type: { $exists: true } },
-                    ],
-                })
-                .sort({ timestamp: -1 })
-                .limit(1);
-
-            if (a[0] && a[0].userId == userOsuId) {
-                nominationsPopped.push(event);
-            }
-        }
-    }
-
-    // filter nominationsDisqualified
-    let nominationsDisqualified = [];
-
-    for (const event of allNominationsDisqualified) {
-        if (uniqueNominations.some(n => n.beatmapsetId == event.beatmapsetId && n.timestamp < event.timestamp)) {
-            let a = await Aiess
-                .find({
-                    beatmapsetId: event.beatmapsetId,
-                    timestamp: { $lt: event.timestamp },
-                    $and: [
-                        { type: { $ne: 'rank' } },
-                        { type: { $ne: 'disqualify' } },
-                        { type: { $ne: 'nomination_reset' } },
-                        { type: { $exists: true } },
-                    ],
-                })
-                .sort({ timestamp: -1 })
-                .limit(event.type == 'nomination_reset' ? 1 : 2);
-
-            if ((a[0] && a[0].userId == userOsuId) || (a[1] && a[1].userId == userOsuId)) {
-                nominationsDisqualified.push(event);
-            }
-        }
-    }
+    let [nominationsPopped, nominationsDisqualified] = await Promise.all([
+        filterAttributedResets(userOsuId, uniqueNominations, allNominationsPopped, { isPop: true }),
+        filterAttributedResets(userOsuId, uniqueNominations, allNominationsDisqualified, { isPop: false }),
+    ]);
 
     // filter disqualifiedQualityAssuranceChecks
     disqualifiedQualityAssuranceChecks = disqualifiedQualityAssuranceChecks.filter(dq =>

@@ -39,6 +39,10 @@
                 :osu-id="osuId"
                 :is-evaluation="isEvaluation"
             />
+            <mapper-variety
+                :events="filterEvents(nominations, selectedMode)"
+                :events-id="'mapperVariety-' + unique"
+            />
             <nomination-resets
                 :events="filterEvents(nominationsDisqualified, selectedMode)"
                 :events-id="'nominationsDisqualified'"
@@ -152,6 +156,7 @@
 <script>
 import { mapState } from 'vuex';
 import EventsList from './EventsList.vue';
+import MapperVariety from './MapperVariety.vue';
 import NominationResets from './NominationResets.vue';
 import EvaluationList from './EvaluationList.vue';
 import PublicEvaluationList from './PublicEvaluationList.vue';
@@ -164,6 +169,7 @@ export default {
     name: 'UserActivity',
     components: {
         EventsList,
+        MapperVariety,
         NominationResets,
         EvaluationList,
         PublicEvaluationList,

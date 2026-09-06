@@ -26,6 +26,8 @@
                 :is-active="evaluation.active"
                 :is-app="evaluation.isApplication"
                 :has-mock-evaluators="evaluation.mockEvaluators && evaluation.mockEvaluators.length > 0"
+                :risk-level="cardRiskLevel"
+                :risk-score="cardRiskScore"
             />
 
             <card-footer
@@ -115,6 +117,18 @@ export default {
             if (!this.checkedEvaluations) return false;
 
             return this.checkedEvaluations.includes(this.evaluation.id);
+        },
+        cardRiskLevel() {
+            return this.evaluation.riskLevel
+                || (this.evaluation.riskSnapshot && this.evaluation.riskSnapshot.level)
+                || '';
+        },
+        cardRiskScore() {
+            if (this.evaluation.riskScore != null) return this.evaluation.riskScore;
+
+            const snapshot = this.evaluation.riskSnapshot;
+
+            return snapshot && snapshot.score != null ? snapshot.score : null;
         },
         deadline () { // display +7 days for current BN evals in groups
             if (this.evaluation.isApplication || !this.evaluation.discussion) {

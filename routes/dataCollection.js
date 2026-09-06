@@ -6,6 +6,7 @@ const User = require('../models/user');
 const Logger = require('../models/log');
 const util = require('../helpers/util');
 const osu = require('../helpers/osu');
+const bnRiskService = require('../services/bnRiskService');
 
 const router = express.Router();
 
@@ -248,6 +249,8 @@ router.post('/updateObviousness/:id', middlewares.isNat, async (req, res) => {
     }
 
     Logger.generate(req.session.mongoId, `Updated obviousness of s/${event.beatmapsetId} to '${obviousness}'`, 'dataCollection', event._id);
+
+    bnRiskService.recalcForAiessEvent(event).catch(() => {});
 });
 
 /* POST edit severity */
@@ -272,6 +275,8 @@ router.post('/updateSeverity/:id', middlewares.isNat, async (req, res) => {
     }
 
     Logger.generate(req.session.mongoId, `Updated severity of s/${event.beatmapsetId} to '${severity}'`, 'dataCollection', event._id);
+
+    bnRiskService.recalcForAiessEvent(event).catch(() => {});
 });
 
 module.exports = router;

@@ -61,6 +61,13 @@
                 </div>
 
                 <div v-else>
+                    <risk-card
+                        v-if="showRiskUi"
+                        :result="riskResult"
+                        :loading="riskLoading"
+                        :can-refresh="Boolean(selectedEvaluation.active)"
+                        @refresh="refreshRisk"
+                    />
                     <user-activity
                         :osu-id="selectedEvaluation.user.osuId"
                         :modes="modes"
@@ -85,6 +92,19 @@
                 </div>
 
                 <evaluation-link />
+
+                <hr>
+
+                <penalty-history
+                    v-if="showRiskUi"
+                    :user-id="selectedEvaluation.user.id"
+                    :modes="[selectedEvaluation.mode]"
+                    :lock-mode="true"
+                    :initial-mode="selectedEvaluation.mode"
+                    :can-create="Boolean(loggedInUser.isNat || loggedInUser.isTrialNat)"
+                    :refresh-nonce="penaltyNonce"
+                    @changed="onPenaltyChanged"
+                />
 
                 <hr>
 
@@ -159,6 +179,8 @@ import DiscussionInfo from './DiscussionInfo.vue';
 import EvaluationIsSecurityChecked from './applications/EvaluationIsSecurityChecked.vue';
 import DebugViewDocument from '../../DebugViewDocument.vue';
 import ApplicantComment from './applications/ApplicantComment.vue';
+import RiskCard from '../../penalties/RiskCard.vue';
+import PenaltyHistory from '../../penalties/PenaltyHistory.vue';
 
 export default {
     name: 'EvaluationInfo',
@@ -182,10 +204,15 @@ export default {
         DebugViewDocument,
         AssignmentHistory,
         ApplicantComment,
+        RiskCard,
+        PenaltyHistory,
     },
     data () {
         return {
             vote: null,
+            riskResult: null,
+            riskLoading: false,
+            penaltyNonce: 0,
         };
     },
     computed: {
@@ -207,8 +234,67 @@ export default {
         isNatEval () {
             return isNatEvaluation(this.selectedEvaluation);
         },
+        showRiskUi () {
+            if (!this.selectedEvaluation || !this.loggedInUser) return false;
+            if (!this.loggedInUser.isNat && !this.loggedInUser.isTrialNat) return false;
+            if (this.selectedEvaluation.isApplication || this.isNatEval) return false;
+            if (this.selectedEvaluation.mode === 'none') return false;
+
+            return true;
+        },
+    },
+    watch: {
+        'selectedEvaluation.id': {
+            immediate: true,
+            handler() {
+                const snapshot = this.selectedEvaluation && this.selectedEvaluation.riskSnapshot;
+
+                this.riskResult = this.showRiskUi && snapshot && snapshot.level
+                    ? snapshot
+                    : null;
+                this.riskLoading = false;
+            },
+        },
     },
     methods: {
+        applyRiskResult(data) {
+            this.riskResult = data;
+            this.$store.commit('evaluations/updateEvaluation', {
+                ...this.selectedEvaluation,
+                riskSnapshot: data,
+                riskLevel: data.level,
+                riskScore: data.score,
+                limitedHistory: data.limitedHistory,
+            });
+        },
+        async refreshRisk(e) {
+            if (!this.showRiskUi || !this.selectedEvaluation.active) return;
+
+            const evalId = this.selectedEvaluation.id;
+
+            this.riskLoading = true;
+
+            const data = await this.$http.executePost(
+                `/bnEval/refreshRisk/${evalId}`,
+                {},
+                e
+            );
+
+            if (!this.selectedEvaluation || this.selectedEvaluation.id !== evalId) return;
+
+            if (this.$http.isValid(data) && data.level) {
+                this.applyRiskResult(data);
+            }
+
+            this.riskLoading = false;
+        },
+        onPenaltyChanged() {
+            this.penaltyNonce += 1;
+
+            if (this.selectedEvaluation.active) {
+                this.refreshRisk();
+            }
+        },
         evaluatorVibeChecked () {
             if (!this.loggedInUser.isNat) {
                 return true; // no vibe check needed for non-NAT

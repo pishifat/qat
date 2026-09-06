@@ -38,6 +38,7 @@ interface IEvaluationBase {
         type: string;
     }[];
     mockReviews?: IReviewDocument[];
+    riskSnapshot?: any;
 }
 
 export interface IAppEvaluationDocument extends IEvaluationBase, Document {
