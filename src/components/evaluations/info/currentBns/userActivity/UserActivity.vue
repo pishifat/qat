@@ -39,6 +39,10 @@
                 :osu-id="osuId"
                 :is-evaluation="isEvaluation"
             />
+            <mapper-variety
+                :events="filterEvents(nominations, selectedMode)"
+                :events-id="'mapperVariety-' + unique"
+            />
             <nomination-resets
                 :events="filterEvents(nominationsDisqualified, selectedMode)"
                 :events-id="'nominationsDisqualified'"
@@ -58,10 +62,6 @@
                 :events="filterEvents(pops, selectedMode)"
                 :events-id="'popsByUser'"
                 :header="'Pops done by user'"
-            />
-            <mapper-variety
-                :events="filterEvents(nominations, selectedMode)"
-                :events-id="'mapperVariety-' + unique"
             />
 
             <template v-if="loggedInUser && loggedInUser.isNat">

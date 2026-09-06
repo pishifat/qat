@@ -54,7 +54,7 @@ export default {
         },
         header: {
             type: String,
-            default: 'Mapper variety',
+            default: 'Unique nominated mappers',
         },
         eventsId: {
             type: String,
