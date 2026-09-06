@@ -143,6 +143,29 @@ router.post('/refreshRisk/:id', middlewares.isNatOrTrialNat, async (req, res) =>
     res.json(result);
 });
 
+/* POST recalculate risk for all active BN/resignation evals */
+router.post('/refreshAllActiveRisk', middlewares.isNatLeader, async (req, res) => {
+    const summary = await bnRiskService.refreshAllActiveEvaluations();
+
+    Logger.generate(
+        req.session.mongoId,
+        `Recalculated evaluation risk for ${summary.updated} active BN eval(s)`,
+        'bnEvaluation',
+        undefined,
+        summary
+    );
+
+    const parts = [`Updated ${summary.updated}`];
+
+    if (summary.skipped) parts.push(`skipped ${summary.skipped}`);
+    if (summary.failed) parts.push(`failed ${summary.failed}`);
+
+    res.json({
+        ...summary,
+        success: `${parts.join(', ')} of ${summary.total} active BN evals`,
+    });
+});
+
 function isValidMode(modeToCheck, isOsu, isTaiko, isCatch, isMania) {
     return ((modeToCheck == 'osu' && isOsu) ||
         (modeToCheck == 'taiko' && isTaiko) ||

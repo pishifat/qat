@@ -14,22 +14,33 @@
                         </button>
                     </div>
 
-                    <div class="sort-filter sort-filter--small">
-                        <span class="sort-filter__title--large">Mark selected as</span>
-                        <button class="btn btn-primary btn-sm ms-2 mt-2" @click="setGroupEval($event)">
-                            Group evaluation
-                        </button>
-                        <button class="btn btn-primary btn-sm ms-2 mt-2" @click="setIndividualEval($event)">
-                            Individual evaluation
-                        </button>
+                    <div class="d-flex flex-wrap align-items-baseline justify-content-between gap-2">
+                        <div class="sort-filter sort-filter--small">
+                            <span class="sort-filter__title--large">Mark selected as</span>
+                            <button class="btn btn-primary btn-sm ms-2 mt-2" @click="setGroupEval($event)">
+                                Group evaluation
+                            </button>
+                            <button class="btn btn-primary btn-sm ms-2 mt-2" @click="setIndividualEval($event)">
+                                Individual evaluation
+                            </button>
+                            <button
+                                class="btn btn-danger btn-sm ms-2 mt-2"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="Moves an evaluation to archives and applies its consensus to its user"
+                                @click="setComplete($event)"
+                            >
+                                Archive
+                            </button>
+                        </div>
                         <button
-                            class="btn btn-danger btn-sm ms-2 mt-2"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title="Moves an evaluation to archives and applies its consensus to its user"
-                            @click="setComplete($event)"
+                            v-if="kind !== 'applications' && loggedInUser.isNatLeader"
+                            class="btn btn-secondary btn-sm mt-2 me-1"
+                            type="button"
+                            :disabled="refreshAllRiskLoading"
+                            @click="refreshAllActiveRisk($event)"
                         >
-                            Archive
+                            {{ refreshAllRiskLoading ? 'Updating...' : 'Update all risk' }}
                         </button>
                     </div>
                 </template>
@@ -150,6 +161,11 @@ export default {
             'individualEvaluations',
             'discussionEvaluations',
         ]),
+    },
+    data() {
+        return {
+            refreshAllRiskLoading: false,
+        };
     },
     beforeCreate () {
         if (this.$store.hasModule('evaluations')) {
@@ -290,7 +306,15 @@ export default {
                 }
             }
         },
+        async refreshAllActiveRisk(e) {
+            if (!confirm('Recalculate evaluation risk for all active BN evaluations? This can take a while.')) {
+                return;
+            }
+
+            this.refreshAllRiskLoading = true;
+            await this.$http.executePost('/bnEval/refreshAllActiveRisk', {}, e);
+            this.refreshAllRiskLoading = false;
+        },
     },
 };
 </script>
-t

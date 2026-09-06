@@ -218,11 +218,61 @@ async function recalcForAiessEvent(event) {
     }
 }
 
+async function refreshAllActiveEvaluations() {
+    const evaluations = await Evaluation.find({
+        active: true,
+        kind: { $in: ['currentBn', 'resignation'] },
+    }).populate('user', 'username osuId modesInfo groups evaluatorModes');
+
+    let updated = 0;
+    let skipped = 0;
+    let failed = 0;
+
+    console.log(`[risk] refreshing ${evaluations.length} active BN evals`);
+
+    for (const evaluation of evaluations) {
+        if (!shouldCalculateEvalRisk(evaluation)) {
+            skipped += 1;
+            console.log(`[risk] skipped ${evaluation.user.username} ${evaluation.mode} ${evaluation.kind}`);
+            continue;
+        }
+
+        try {
+            const result = await calculateAndStoreForEvaluation(evaluation);
+
+            if (result && result.error) {
+                failed += 1;
+                console.log(`[risk] failed ${evaluation.user.username} ${evaluation.mode} ${evaluation.kind}: ${result.error}`);
+            } else {
+                updated += 1;
+                const username = evaluation.user && evaluation.user.username
+                    ? evaluation.user.username
+                    : userIdOf(evaluation.user);
+
+                console.log(
+                    `[risk] updated ${username} ${evaluation.mode} ${evaluation.kind}: ${result.level} ${result.score}/100`
+                );
+            }
+        } catch (error) {
+            failed += 1;
+            console.log(`[risk] failed ${evaluation.user.username} ${evaluation.mode} ${evaluation.kind}: ${error}`);
+        }
+    }
+
+    return {
+        updated,
+        skipped,
+        failed,
+        total: evaluations.length,
+    };
+}
+
 module.exports = {
     calculateBnRisk,
     calculateAndStoreForEvaluation,
     storeOnActiveBnEval,
     recalculateActiveBnEval,
+    refreshAllActiveEvaluations,
     riskWebhookFields,
     hasStoredRisk,
     shouldCalculateEvalRisk,
