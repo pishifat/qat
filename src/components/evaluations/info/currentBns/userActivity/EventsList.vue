@@ -47,6 +47,24 @@
                         >
                             ({{ totalDrain(event.beatmaps) }})
                         </span>
+                        <i
+                            v-if="trackId(event)"
+                            class="fas fa-microphone text-info ms-1"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                            title="Featured Artist"
+                        />
+                        <span
+                            v-if="userDiscussionsCount(event) != null"
+                            class="badge ms-1"
+                            :class="discussionBadgeClass(userDiscussionsCount(event))"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="right"
+                            title="discussion posts"
+                        >
+                            <i class="fas fa-comments" />
+                            {{ userDiscussionsCount(event) }}
+                        </span>
                         <a
                             v-if="loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
                             href="#"
@@ -181,6 +199,26 @@ export default {
         },
         timestamp(event) {
             return event.timestamp;
+        },
+        trackId(event) {
+            if (this.eventsId == 'qualityAssuranceChecks') {
+                return event.event.trackId;
+            } else {
+                return event.trackId;
+            }
+        },
+        userDiscussionsCount(event) {
+            if (this.eventsId == 'qualityAssuranceChecks') {
+                return event.event.UserDiscussionsCount;
+            } else {
+                return event.UserDiscussionsCount;
+            }
+        },
+        discussionBadgeClass(count) {
+            if (count < 5) return 'text-bg-danger';
+            if (count <= 10) return 'text-bg-warning';
+
+            return 'text-bg-success';
         },
         totalDrain(beatmaps) {
             let drain = 0;
