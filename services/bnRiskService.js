@@ -23,14 +23,6 @@ function evalActivityWindow(evaluation = {}) {
     return { minDate, maxDate };
 }
 
-function userIdOf(user) {
-    if (!user) return null;
-    if (user.id) return user.id;
-    if (user._id) return user._id;
-
-    return user;
-}
-
 function decorateRiskFields(obj) {
     const snapshot = obj && obj.riskSnapshot;
 
@@ -152,8 +144,7 @@ async function calculateAndStoreForEvaluation(evaluation) {
         return { error: 'Archived evaluations keep their original risk snapshot' };
     }
 
-    const userId = userIdOf(evaluation.user);
-    const result = await calculateBnRisk(userId, evaluation.mode, {
+    const result = await calculateBnRisk(evaluation.user, evaluation.mode, {
         excludeEvalId: evaluation._id || evaluation.id,
         deadline: evaluation.deadline,
         activityToCheck: evaluation.activityToCheck,
@@ -247,7 +238,7 @@ async function refreshAllActiveEvaluations() {
                 updated += 1;
                 const username = evaluation.user && evaluation.user.username
                     ? evaluation.user.username
-                    : userIdOf(evaluation.user);
+                    : evaluation.user;
 
                 console.log(
                     `[risk] updated ${username} ${evaluation.mode} ${evaluation.kind}: ${result.level} ${result.score}/100`
