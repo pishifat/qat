@@ -1,52 +1,24 @@
 <template>
     <div>
         <p>
-            <b>
-                Notes
-            </b>
+            <a href="#userNotes" data-bs-toggle="collapse">
+                Notes <i class="fas fa-angle-down" />
+            </a>
         </p>
 
-        <div v-if="warningNote" class="my-2">
-            <b>Latest warning/action -
-                {{ toStandardDate(warningNote.updatedAt) }} -
-                <user-link
-                    :osu-id="warningNote.author.osuId"
-                    :username="warningNote.author.username"
-                />
-            </b>
-            <div class="ms-4 small text-secondary" v-html="$md.render(warningNote.comment)" />
-        </div>
-
-        <textarea
-            v-model="comment"
-            placeholder="user note..."
-            class="form-control"
-            rows="2"
-        />
-
-        <div class="row mt-1">
-            <div class="col-sm-6">
-                <button class="btn btn-primary w-100 btn-sm" @click="saveNote($event)">
-                    Save new note
-                </button>
+        <div id="userNotes" class="collapse">
+            <div v-if="warningNote" class="my-2">
+                <b>Latest warning/action -
+                    {{ toStandardDate(warningNote.updatedAt) }} -
+                    <user-link
+                        :osu-id="warningNote.author.osuId"
+                        :username="warningNote.author.username"
+                    />
+                </b>
+                <div class="ms-4 small text-secondary" v-html="$md.render(warningNote.comment)" />
             </div>
-            <div class="col-sm-6">
-                <button class="btn btn-danger w-100 btn-sm" @click="saveNote($event, 'warning')">
-                    {{ warningNote ? 'Overwrite' : 'Save' }} warning
-                </button>
-            </div>
-        </div>
 
-        <div class="mt-2">
-            <b>
-                Other notes
-            </b>
-            <p class="p-40 mt-2 ms-3">
-                <a href="#otherNotes" data-bs-toggle="collapse">
-                    Notes <i class="fas fa-angle-down" />
-                </a>
-            </p>
-            <ul id="otherNotes" class="collapse mt-2">
+            <ul class="mt-2">
                 <li v-if="!otherNotes" class="small">
                     ...
                 </li>
@@ -102,6 +74,26 @@
                     </div>
                 </li>
             </ul>
+
+            <textarea
+                v-model="comment"
+                placeholder="user note..."
+                class="form-control mt-2"
+                rows="2"
+            />
+
+            <div class="row mt-1">
+                <div class="col-sm-6">
+                    <button class="btn btn-primary w-100 btn-sm" @click="saveNote($event)">
+                        Save new note
+                    </button>
+                </div>
+                <div class="col-sm-6">
+                    <button class="btn btn-danger w-100 btn-sm" @click="saveNote($event, 'warning')">
+                        {{ warningNote ? 'Overwrite' : 'Save' }} warning
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
