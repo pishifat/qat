@@ -2,7 +2,7 @@
     <div>
         <p>
             <a :href="'#' + collapseId" data-bs-toggle="collapse">
-                Penalty History <i class="fas fa-angle-down" />
+                Penalties <i class="fas fa-angle-down" />
             </a>
         </p>
 
