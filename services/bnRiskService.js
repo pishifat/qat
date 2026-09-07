@@ -38,9 +38,11 @@ function decorateRiskFields(obj) {
 function riskWebhookFields(result) {
     if (!result || result.error || !result.level) return [];
 
+    const formattedLevel = result.level.charAt(0) + result.level.slice(1).toLowerCase();
+
     return [{
         name: 'Evaluation risk',
-        value: `**${result.level}** (${result.score}/100)${result.limitedHistory ? ' (limited history)' : ''}`,
+        value: `**${formattedLevel}** (${result.score}/100)${result.limitedHistory ? ' (limited history)' : ''}`,
     }];
 }
 
