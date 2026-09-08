@@ -34,7 +34,7 @@ const aiessSchema = new mongoose.Schema({
     chartUpvoted: [{ type: 'ObjectId', ref: 'User' }], // user IDs who have upvoted this charted event
     chartDownvoted: [{ type: 'ObjectId', ref: 'User' }], // user IDs who have downvoted this charted event
     trackId: { type: Number }, // ID of featured artist track, used to track FA nominations
-    UserDiscussionsCount: { type: Number }, // number of posts the user has in the map's discussion at the time of the event
+    userDiscussionsCount: { type: Number }, // number of posts the user has in the map's discussion at the time of the event
 
     qaComment: { type: String }, // temporary field added during user activity for disqualified qa checks
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });

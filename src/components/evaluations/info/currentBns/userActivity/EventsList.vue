@@ -209,9 +209,9 @@ export default {
         },
         userDiscussionsCount(event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
-                return event.event.UserDiscussionsCount;
+                return event.event.userDiscussionsCount;
             } else {
-                return event.UserDiscussionsCount;
+                return event.userDiscussionsCount;
             }
         },
         discussionBadgeClass(count) {

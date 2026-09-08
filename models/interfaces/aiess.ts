@@ -32,6 +32,8 @@ interface IAiess {
     effortBonus: number;
     responsibleNominators: number[];
     isReviewed: boolean;
+    trackId: number;
+    userDiscussionsCount: number;
     qaComment: string; // temporary field added during user activity for disqualified qa checks
     qualityAssuranceChecks: IQualityAssuranceCheckDocument[]; // virtual
 }
