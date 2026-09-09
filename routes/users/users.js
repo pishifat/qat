@@ -1685,7 +1685,8 @@ router.get('/activity', middlewares.optionalLogin, async (req, res) => {
     );
 
     const isNatOrTrialNat = res.locals.userRequest && res.locals.userRequest.isNatOrTrialNat;
-    const generalEvents = await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate, isNatOrTrialNat);
+    const isNat = Boolean(res.locals.userRequest && res.locals.userRequest.isNat);
+    const generalEvents = await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate, isNatOrTrialNat, isNat);
 
     res.json({
         ...generalEvents,

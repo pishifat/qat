@@ -21,6 +21,16 @@
                             :username="mapper.creatorName || 'Unknown'"
                             :osu-id="mapper.creatorId"
                         />
+                        <template v-if="showStaffPills">
+                            <span
+                                v-if="mapper.creatorGroups.includes('nat')"
+                                class="badge rounded-pill ms-1 text-bg-nat"
+                            >NAT</span>
+                            <span
+                                v-if="mapper.creatorGroups.includes('bn')"
+                                class="badge rounded-pill ms-1 text-bg-bn"
+                            >BN</span>
+                        </template>
                     </td>
                     <td>
                         {{ mapper.count }}
@@ -62,7 +72,11 @@ export default {
         },
     },
     computed: {
+        ...mapState(['loggedInUser']),
         ...mapState('activity', ['isLoading']),
+        showStaffPills() {
+            return Boolean(this.loggedInUser && this.loggedInUser.isNat);
+        },
         mappers() {
             const groups = new Map();
 
@@ -76,6 +90,7 @@ export default {
                     groups.set(key, {
                         creatorId: event.creatorId,
                         creatorName: event.creatorName,
+                        creatorGroups: event.creatorGroups || [],
                         count: 1,
                     });
                 }

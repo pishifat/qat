@@ -948,7 +948,7 @@ router.post('/replaceUser/:id', middlewares.isNat, async (req, res) => {
     );
 });
 
-async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, includeObviousnessSeverity = true) {
+async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, includeObviousnessSeverity = true, includeCreatorGroups = false) {
     const userOsuId = parseInt(osuIdInput);
 
     if (isNaN(osuIdInput)) {
@@ -972,8 +972,11 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
 
     const beatmapsetIds = uniqueNominations.map(n => n.beatmapsetId);
     const qaBeatmapsetIds = qualityAssuranceChecks.map(qa => qa.event.beatmapsetId);
+    const creatorIds = includeCreatorGroups
+        ? [...new Set(uniqueNominations.map(n => n.creatorId).filter(id => id != null))]
+        : [];
 
-    let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks] = await Promise.all([
+    let [allNominationsDisqualified, allNominationsPopped, disqualifiedQualityAssuranceChecks, staffMappers] = await Promise.all([
         Aiess.getRelatedBeatmapsetEvents(
             userOsuId,
             beatmapsetIds,
@@ -995,7 +998,25 @@ async function getGeneralEvents (osuIdInput, mongoId, modes, minDate, maxDate, i
             timestamp: { $gt: minDate, $lt: maxDate },
             type: 'disqualify',
         }),
+        creatorIds.length
+            ? User.find({
+                osuId: { $in: creatorIds },
+                groups: { $in: ['bn', 'nat'] },
+            }).select('osuId groups').lean()
+            : Promise.resolve([]),
     ]);
+
+    if (includeCreatorGroups) {
+        const groupsByOsuId = new Map();
+
+        for (const user of staffMappers) {
+            groupsByOsuId.set(user.osuId, user.groups.filter(g => g === 'bn' || g === 'nat'));
+        }
+
+        for (const nomination of uniqueNominations) {
+            nomination.creatorGroups = groupsByOsuId.get(nomination.creatorId) || [];
+        }
+    }
 
     let [nominationsPopped, nominationsDisqualified] = await Promise.all([
         filterAttributedResets(userOsuId, uniqueNominations, allNominationsPopped, { isPop: true }),
@@ -1237,7 +1258,7 @@ router.get('/activity', async (req, res) => {
     );
 
     res.json({
-        ...await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate, res.locals.userRequest.isNatOrTrialNat),
+        ...await getGeneralEvents(osuId, mongoId, modes, minDate, maxDate, res.locals.userRequest.isNatOrTrialNat, res.locals.userRequest.isNat),
         assignedBnApplications,
         appEvaluations,
         bnEvaluations,

@@ -56,7 +56,7 @@
                         />
                         <span
                             v-if="userDiscussionsCount(event) != null"
-                            class="badge ms-1"
+                            class="badge rounded-pill ms-1"
                             :class="discussionBadgeClass(userDiscussionsCount(event))"
                             data-bs-toggle="tooltip"
                             data-bs-placement="right"
