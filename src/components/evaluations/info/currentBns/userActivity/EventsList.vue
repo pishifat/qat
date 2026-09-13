@@ -67,6 +67,7 @@
                                     v-for="row in discussionBreakdown(event)"
                                     :key="row.key"
                                     class="discussion-counts-row"
+                                    :class="{ 'is-zero': !row.count }"
                                 >
                                     <span class="discussion-counts-type">
                                         <i
@@ -336,6 +337,10 @@ export default {
     gap: 1rem;
     font-size: 0.8rem;
     line-height: 1.4;
+}
+
+.discussion-counts-row.is-zero {
+    opacity: 0.4;
 }
 
 .discussion-counts-type {
