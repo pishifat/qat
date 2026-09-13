@@ -33,7 +33,14 @@ interface IAiess {
     responsibleNominators: number[];
     isReviewed: boolean;
     trackId: number;
-    userDiscussionsCount: number;
+    userDiscussionsCounts: {
+        suggestion: number;
+        problem: number;
+        mapper_note: number;
+        praise: number;
+        hype: number;
+        review: number;
+    };
     qaComment: string; // temporary field added during user activity for disqualified qa checks
     qualityAssuranceChecks: IQualityAssuranceCheckDocument[]; // virtual
 }
