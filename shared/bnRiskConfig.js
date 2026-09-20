@@ -57,17 +57,17 @@ const PENALTY_WEIGHTS = Object.freeze({
 
 const SEV_WEIGHTS = Object.freeze({
     '0/0': 0,
-    '0/1': 1,
-    '0/2': 2,
-    '0/3': 6,
-    '1/0': 1,
-    '1/1': 6,
-    '1/2': 9,
-    '1/3': 18,
-    '2/0': 2,
-    '2/1': 9,
-    '2/2': 18,
-    '2/3': 27,
+    '0/1': 6, // rarely used
+    '0/2': 12, // never used
+    '0/3': 18, // never used
+    '1/0': 6,
+    '1/1': 12,
+    '1/2': 24,
+    '1/3': 36, // never used
+    '2/0': 16,
+    '2/1': 28,
+    '2/2': 48,
+    '2/3': 64,
 });
 
 const RISK_GUIDANCE = Object.freeze({
