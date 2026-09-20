@@ -94,6 +94,11 @@
                 <vibe-check-stats />
             </section>
 
+            <section v-if="loggedInUser && loggedInUser.isNat" class="card card-body">
+                <h5>Mode risk</h5>
+                <mode-risk-stats />
+            </section>
+
             <section v-if="loggedInUser && loggedInUser.isNatLeader" class="card card-body">
                 <h5>Elite Nominator stats</h5>
                 <elite-nominator-stats />
@@ -126,6 +131,7 @@ import GmtActivity from '../components/users/GmtActivity.vue';
 import FilterBox from '../components/FilterBox.vue';
 import PaginationNav from '../components/PaginationNav.vue';
 import VibeCheckStats from '../components/users/VibeCheckStats.vue';
+import ModeRiskStats from '../components/users/ModeRiskStats.vue';
 import EliteNominatorStats from '../components/users/EliteNominatorStats.vue';
 import TemporaryInfo from '../components/users/TemporaryInfo.vue';
 import WikiMarkdownGenerator from '../components/users/WikiMarkdownGenerator.vue';
@@ -142,6 +148,7 @@ export default {
         FilterBox,
         PaginationNav,
         VibeCheckStats,
+        ModeRiskStats,
         EliteNominatorStats,
         TemporaryInfo,
         WikiMarkdownGenerator,

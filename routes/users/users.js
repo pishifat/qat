@@ -19,6 +19,7 @@ const { BnEvaluationConsensus, BnEvaluationAddition, AppEvaluationConsensus, Gen
 const { websocketManager } = require("../../helpers/websocket");
 const osu = require('../../helpers/osu');
 const { guard } = require('../../helpers/guard');
+const bnRiskService = require('../../services/bnRiskService');
 
 const router = express.Router();
 
@@ -444,6 +445,17 @@ router.get('/findVibeCheckStats', middlewares.isLoggedIn, middlewares.isAdmin, a
     }
 
     res.json(users);
+});
+
+/* GET stored risk for all current BN/NAT in a mode */
+router.get('/findModeRisk', middlewares.isLoggedIn, middlewares.isNat, async (req, res) => {
+    const result = await bnRiskService.getStoredModeRisk(req.query.mode);
+
+    if (result.error) {
+        return res.json({ error: result.error });
+    }
+
+    res.json(result);
 });
 
 /* POST update discord ID */

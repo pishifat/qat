@@ -2,12 +2,14 @@ const Evaluation = require('../models/evaluations/evaluation');
 const BnEvaluation = require('../models/evaluations/bnEvaluation');
 const Penalty = require('../models/penalty');
 const User = require('../models/user');
+const UserRisk = require('../models/userRisk');
 const Aiess = require('../models/aiess');
 const { isNatEvaluation } = require('../shared/isNatEvaluation');
 const { scoreBnRisk } = require('../shared/bnRiskEngine');
 const { GAMEPLAY_MODES } = require('../shared/bnRiskConfig');
 const { getAttributedNominationResets } = require('../helpers/nominationResetsAttribution');
 const { stripRiskFields } = require('../helpers/stripRiskFields');
+const util = require('../helpers/util');
 
 function isGameplayMode(mode) {
     return GAMEPLAY_MODES.includes(mode);
@@ -278,8 +280,119 @@ async function refreshAllActiveEvaluations() {
     };
 }
 
+function nextUserRiskSync(from = new Date()) {
+    const next = new Date(from);
+    next.setUTCHours(13, 30, 0, 0);
+
+    if (from >= next) {
+        next.setUTCDate(next.getUTCDate() + 1);
+    }
+
+    return next;
+}
+
+async function syncAllUserRisks() {
+    const now = new Date();
+    const keep = [];
+    let updated = 0;
+    let failed = 0;
+
+    for (const mode of GAMEPLAY_MODES) {
+        const users = await User.find({
+            groups: { $in: ['bn', 'nat'] },
+            'modesInfo.mode': mode,
+        }).select('username osuId modesInfo groups');
+
+        for (const user of users) {
+            try {
+                const risk = await calculateBnRisk(user.id, mode);
+
+                if (risk.error) {
+                    failed += 1;
+                    continue;
+                }
+
+                await UserRisk.findOneAndUpdate(
+                    { user: user.id, mode },
+                    {
+                        score: risk.score,
+                        level: risk.level,
+                        limitedHistory: Boolean(risk.limitedHistory),
+                        calculatedAt: now,
+                    },
+                    { upsert: true }
+                );
+
+                keep.push({ user: user.id, mode });
+                updated += 1;
+            } catch (error) {
+                failed += 1;
+                console.log(`[risk] user sync failed ${user.username} ${mode}: ${error}`);
+            }
+
+            await util.sleep(1000);
+        }
+    }
+
+    if (keep.length) {
+        await UserRisk.deleteMany({
+            $nor: keep.map(entry => ({ user: entry.user, mode: entry.mode })),
+        });
+    }
+
+    console.log(`[risk] user risk sync: ${updated} updated, ${failed} failed`);
+
+    return {
+        updated,
+        failed,
+        calculatedAt: now,
+        nextUpdate: nextUserRiskSync(now),
+    };
+}
+
+async function getStoredModeRisk(mode) {
+    if (!isGameplayMode(mode)) {
+        return { error: 'Invalid mode' };
+    }
+
+    const records = await UserRisk
+        .find({ mode })
+        .populate('user', 'username osuId')
+        .sort({ score: -1 });
+
+    const users = [];
+    let lastUpdated = null;
+
+    for (const record of records) {
+        if (!record.user) continue;
+
+        users.push({
+            id: record.user.id,
+            username: record.user.username,
+            osuId: record.user.osuId,
+            score: record.score,
+            level: record.level,
+        });
+
+        if (!lastUpdated || record.calculatedAt > lastUpdated) {
+            lastUpdated = record.calculatedAt;
+        }
+    }
+
+    users.sort((a, b) => b.score - a.score || a.username.localeCompare(b.username));
+
+    return {
+        users,
+        lastUpdated,
+        nextUpdate: nextUserRiskSync(),
+    };
+}
+
 module.exports = {
     calculateBnRisk,
+    getStoredModeRisk,
+    syncAllUserRisks,
+    nextUserRiskSync,
     calculateAndStoreForEvaluation,
     storeOnActiveBnEval,
     recalculateActiveBnEval,

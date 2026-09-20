@@ -1215,6 +1215,22 @@ const checkTenureValidity = cron.schedule('0 0 2 * *', async () => {
     scheduled: false,
 });
 
+/**
+ * Recalculate stored BN/NAT risk scores for every gameplay mode.
+ */
+const syncUserRisks = cron.schedule('30 13 * * *', async () => {
+    console.log('[risk] starting daily user risk sync');
+
+    try {
+        const summary = await bnRiskService.syncAllUserRisks();
+        console.log(`[risk] daily user risk sync done: ${summary.updated} updated, ${summary.failed} failed`);
+    } catch (error) {
+        console.log(`[risk] daily user risk sync failed: ${error}`);
+    }
+}, {
+    scheduled: false,
+});
+
 module.exports = {
     notifyReports,
     expirePendingVetoes,
@@ -1231,4 +1247,5 @@ module.exports = {
     spawnProbationEvaluations,
     spawnHighActivityEvaluations,
     spawnLowActivityEvaluations,
+    syncUserRisks,
 };
