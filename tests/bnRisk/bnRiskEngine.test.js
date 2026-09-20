@@ -264,7 +264,30 @@ describe('bnRiskEngine', () => {
         assert.ok(Math.abs(recencyWeight(12) - 0.25) < 0.01);
     });
 
-    it('raises risk for several recent moderate penalties and more for repeated serious ones', () => {
+    it('lands a fresh moderate near MEDIUM, a major near HIGH, and a severe in mid HIGH', () => {
+        const moderate = scoreBnRisk({
+            penalties: [penalty({ severity: 'moderate', months: 0, now })],
+            now,
+        });
+        const major = scoreBnRisk({
+            penalties: [penalty({ severity: 'major', months: 0, now })],
+            now,
+        });
+        const severe = scoreBnRisk({
+            penalties: [penalty({ severity: 'severe', months: 0, now })],
+            now,
+        });
+
+        assert.equal(moderate.score, 27);
+        assert.equal(moderate.level, 'LOW');
+        assert.equal(major.score, 58);
+        assert.equal(major.level, 'MEDIUM');
+        assert.equal(severe.score, 80);
+        assert.equal(severe.level, 'HIGH');
+        assert.equal(severe.policy.floor, 'severeConcern');
+    });
+
+    it('raises risk further for several recent moderate penalties and more for repeated serious ones', () => {
         const severalModerate = scoreBnRisk({
             penalties: [
                 penalty({ severity: 'moderate', months: 0, now }),
@@ -281,8 +304,9 @@ describe('bnRiskEngine', () => {
             now,
         });
 
-        assert.ok(severalModerate.level === 'LOW' || severalModerate.level === 'MEDIUM');
-        assert.ok(repeatedSevere.score > severalModerate.score);
+        assert.equal(severalModerate.level, 'HIGH');
+        assert.ok(severalModerate.score >= 60);
+        assert.ok(repeatedSevere.score >= severalModerate.score);
         assert.equal(repeatedSevere.level, 'HIGH');
         assert.equal(repeatedSevere.policy.activeSevereConcern, true);
         assert.equal(repeatedSevere.policy.floor, 'severeConcern');
