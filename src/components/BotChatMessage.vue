@@ -125,6 +125,10 @@ export default {
 
                 const res = await this.$http.executePost(`/${route}/sendMessages/${mongoId}`, { users: this.users, message: this.message, type }, e);
 
+                if (this.messageType == 'report' && this.$http.isValid(res) && res.report) {
+                    this.$store.dispatch('manageReports/updateReport', res.report);
+                }
+
                 if (this.messageType == 'eval' && res.success) {
                     await this.$http.executePost(`/${route}/setComplete/`, { evalIds: [mongoId] });
                     $('#evaluationInfo').modal('hide');

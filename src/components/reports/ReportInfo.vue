@@ -17,7 +17,7 @@
             <feedback class="mb-3" />
 
             <report-feedback-pm
-                v-if="!selectedReport.isActive && !selectedReport.isAiBeatmap"
+                v-if="!selectedReport.isActive"
             />
         </div>
     </modal-dialog>

@@ -282,6 +282,10 @@ router.post('/sendMessages/:id', async (req, res) => {
         return res.json({ error: 'Messages cannot be sent for AI beatmap reports' });
     }
 
+    if (report.isMessageSent) {
+        return res.json({ error: 'A message has already been sent for this report' });
+    }
+
     req.body.users.push({ osuId: req.session.osuId });
 
     const osuIds = req.body.users.map(user => user.osuId);
@@ -297,7 +301,13 @@ router.post('/sendMessages/:id', async (req, res) => {
         return res.json({ error: message.error ? message.error : `Messages were not sent.` });
     }
 
-    res.json({ success: 'Messages sent! A copy was sent to you for confirmation' });
+    report.isMessageSent = true;
+    await report.save();
+
+    res.json({
+        success: 'Messages sent! A copy was sent to you for confirmation',
+        report,
+    });
 
     Logger.generate(
         req.session.mongoId,

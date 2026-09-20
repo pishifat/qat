@@ -8,6 +8,7 @@ const reportSchema = new mongoose.Schema({
     valid: { type: Number, enum: [1, 2, 3] },
     feedback: { type: String },
     isActive: { type: Boolean, default: true },
+    isMessageSent: { type: Boolean, default: false },
     category: { type: String, enum: ['stolenBeatmap', 'beatmap', 'aiBeatmap', 'contentCaseSong', 'contentCaseVisual', 'behavior', 'other'] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 

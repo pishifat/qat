@@ -9,6 +9,7 @@ interface IReportDocument extends Document {
     valid: number;
     feedback: string;
     isActive: boolean;
+    isMessageSent: boolean;
     category: string;
     reportCategory: string; // formatted verison of category fetched from category
     isContentCase: boolean; // populated field

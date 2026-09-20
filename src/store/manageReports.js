@@ -25,6 +25,10 @@ export default {
             const i = state.openReports.findIndex(r => r.id === report.id);
             if (i !== -1) state.openReports[i] = report;
         },
+        updateClosedReport (state, report) {
+            const i = state.closedReports.findIndex(r => r.id === report.id);
+            if (i !== -1) state.closedReports[i] = report;
+        },
     },
     getters: {
         allReports: (state) => {
@@ -39,16 +43,17 @@ export default {
             if (report.isActive) {
                 commit('updateOpenReport', report);
             } else {
-                let reports = [...state.openReports];
                 const i = state.openReports.findIndex(r => r.id === report.id);
-                reports.splice(i,1);
-                commit('setOpenReports', reports);
-                commit('setClosedReports', [report]);
-                commit('setIsQueried', true);
-            }
 
-            if (state.selectedReport && state.selectedReport.id === report.id) {
-                commit('setSelectedReportId', report.id);
+                if (i !== -1) {
+                    let reports = [...state.openReports];
+                    reports.splice(i, 1);
+                    commit('setOpenReports', reports);
+                    commit('setClosedReports', [report]);
+                    commit('setIsQueried', true);
+                } else {
+                    commit('updateClosedReport', report);
+                }
             }
         },
     },
