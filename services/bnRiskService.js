@@ -136,11 +136,13 @@ async function recalculateActiveBnEval(userId, mode) {
         mode,
         active: true,
         kind: { $in: ['currentBn', 'resignation'] },
-    });
+    }).populate('user', 'username osuId modesInfo groups');
 
     let result = null;
 
     for (const evaluation of evaluations) {
+        if (!shouldCalculateEvalRisk(evaluation)) continue;
+
         result = await calculateAndStoreForEvaluation(evaluation);
     }
 
@@ -150,6 +152,16 @@ async function recalculateActiveBnEval(userId, mode) {
 async function calculateAndStoreForEvaluation(evaluation) {
     if (!evaluation || !evaluation.active) {
         return { error: 'Archived evaluations keep their original risk snapshot' };
+    }
+
+    if (!evaluation.user || !evaluation.user.modesInfo) {
+        if (typeof evaluation.populate === 'function') {
+            await evaluation.populate('user', 'username osuId modesInfo groups');
+        }
+    }
+
+    if (!shouldCalculateEvalRisk(evaluation)) {
+        return { error: 'Risk is not calculated for this evaluation' };
     }
 
     const result = await calculateBnRisk(evaluation.user, evaluation.mode, {

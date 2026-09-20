@@ -670,7 +670,9 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
                 }
             }
 
-            fields.push(...bnRiskService.riskWebhookFields(assignmentRisk || eval.riskSnapshot));
+            if (bnRiskService.shouldCalculateEvalRisk(eval)) {
+                fields.push(...bnRiskService.riskWebhookFields(assignmentRisk || eval.riskSnapshot));
+            }
 
             // evaluation status webhook
             await discord.webhookPost(
