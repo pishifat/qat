@@ -70,7 +70,7 @@
                 <div v-if="category == 'aiBeatmap'" class="row mb-2">
                     <div class="col-sm-12">
                         <p>The NAT does not handle these reports in any way. They go directly to the people responsible for handling AI beatmap reports. <b>Do not expect a response.</b></p>
-                        <p>Please only report Ranked beatmaps or soon-to-be-qualified beatmaps.</p>
+                        <p>Please only report Ranked, Qualified, or soon-to-be-qualified beatmaps.</p>
                     </div>
                 </div>
 
