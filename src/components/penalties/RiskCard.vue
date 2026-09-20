@@ -7,7 +7,7 @@
                     <span
                         v-if="result"
                         class="badge rounded-pill risk-level-badge"
-                        :class="levelBadgeClass"
+                        :style="levelBadgeStyle"
                     >
                         {{ result.level }}
                         <span v-if="result.limitedHistory" class="ms-1">· LIMITED HISTORY</span>
@@ -26,7 +26,7 @@
 
             <template v-if="result">
                 <p class="mb-1 mt-2">
-                    <span class="fs-4">{{ result.score }}</span>
+                    <span class="fs-4" :style="scoreColorStyle">{{ result.score }}</span>
                     <span class="text-secondary"> / 100</span>
                 </p>
 
@@ -95,7 +95,7 @@
                     </div>
                     <div class="d-flex justify-content-between small mt-1">
                         <span class="text-secondary">Final score</span>
-                        <span class="risk-value" :class="levelTextClass">{{ result.score }}</span>
+                        <span class="risk-value" :style="scoreColorStyle">{{ result.score }}</span>
                     </div>
                 </div>
             </template>
@@ -110,6 +110,8 @@
 </template>
 
 <script>
+import { riskColor, riskBadgeTextColor } from '../../helpers/riskColor';
+
 export default {
     name: 'RiskCard',
     props: {
@@ -140,13 +142,22 @@ export default {
     },
     emits: ['refresh'],
     computed: {
-        levelBadgeClass() {
+        levelBadgeStyle() {
+            const score = this.result && this.result.score;
             const level = this.result && this.result.level;
+            const backgroundColor = riskColor(score, level);
 
-            if (level === 'HIGH') return 'bg-danger';
-            if (level === 'MEDIUM') return 'bg-warning text-dark';
+            if (!backgroundColor) return {};
 
-            return 'bg-success';
+            return {
+                backgroundColor,
+                color: riskBadgeTextColor(score, level),
+            };
+        },
+        scoreColorStyle() {
+            const color = riskColor(this.result && this.result.score, this.result && this.result.level);
+
+            return color ? { color } : {};
         },
         policyMessages() {
             const messages = [];
@@ -182,14 +193,6 @@ export default {
             return this.result && this.result.policy && this.result.policy.floor
                 ? 'text-warning'
                 : 'text-secondary';
-        },
-        levelTextClass() {
-            const level = this.result && this.result.level;
-
-            if (level === 'HIGH') return 'text-danger';
-            if (level === 'MEDIUM') return 'text-warning';
-
-            return 'text-success';
         },
         componentRows() {
             const components = (this.result && this.result.components) || {};

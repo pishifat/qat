@@ -56,8 +56,9 @@
             />
             <i
                 v-if="isNatOrTrialNat && !isApp && !isNatEvaluation && (riskLevel || isActive)"
-                class="ms-2"
+                class="fas fa-flag ms-2"
                 :class="riskIconClass"
+                :style="riskIconStyle"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 :title="riskIconTitle"
@@ -77,6 +78,7 @@
 <script>
 import evaluations from '../../../mixins/evaluations';
 import UserLink from '../../../components/UserLink.vue';
+import { riskColor } from '../../../helpers/riskColor';
 
 export default {
     name: 'CardHeader',
@@ -168,11 +170,13 @@ export default {
     },
     computed: {
         riskIconClass() {
-            if (this.riskLevel === 'HIGH') return 'fas fa-flag text-danger';
-            if (this.riskLevel === 'MEDIUM') return 'fas fa-flag text-warning';
-            if (this.riskLevel === 'LOW') return 'fas fa-flag text-success';
-
-            return 'fas fa-flag text-secondary';
+            return this.riskColorValue ? '' : 'text-secondary';
+        },
+        riskColorValue() {
+            return riskColor(this.riskScore, this.riskLevel);
+        },
+        riskIconStyle() {
+            return this.riskColorValue ? { color: this.riskColorValue } : {};
         },
         riskIconTitle() {
             if (!this.riskLevel) return 'Evaluation risk not calculated';
