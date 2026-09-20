@@ -1218,7 +1218,7 @@ const checkTenureValidity = cron.schedule('0 0 2 * *', async () => {
 /**
  * Recalculate stored BN/NAT risk scores for every gameplay mode.
  */
-const syncUserRisks = cron.schedule('30 13 * * *', async () => {
+const syncUserRisks = cron.schedule('15 12 * * *', async () => {
     console.log('[risk] starting daily user risk sync');
 
     try {

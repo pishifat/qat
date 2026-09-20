@@ -282,7 +282,7 @@ async function refreshAllActiveEvaluations() {
 
 function nextUserRiskSync(from = new Date()) {
     const next = new Date(from);
-    next.setUTCHours(13, 30, 0, 0);
+    next.setUTCHours(12, 15, 0, 0);
 
     if (from >= next) {
         next.setUTCDate(next.getUTCDate() + 1);
