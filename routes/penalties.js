@@ -92,6 +92,41 @@ router.get('/user/:userId', async (req, res) => {
     });
 });
 
+/* GET live risk for a user. Calculated on demand; not stored. */
+router.get('/user/:userId/risk', async (req, res) => {
+    const user = await User.findById(req.params.userId).orFail();
+
+    if (!user.isBnOrNat) {
+        return res.json({ error: 'Risk is only calculated for current BN/NAT members' });
+    }
+
+    let modes;
+
+    if (req.query.mode) {
+        if (!bnRiskService.isGameplayMode(req.query.mode)) {
+            return res.json({ error: 'Invalid mode' });
+        }
+
+        modes = [req.query.mode];
+    } else {
+        modes = bnRiskService.gameplayModesForUser(user);
+    }
+
+    const results = [];
+
+    for (const mode of modes) {
+        const result = await bnRiskService.calculateBnRisk(user.id, mode);
+
+        if (result.error) {
+            return res.json({ error: result.error });
+        }
+
+        results.push({ mode, ...result });
+    }
+
+    res.json({ results });
+});
+
 /* POST create penalty */
 router.post('/', async (req, res) => {
     const { userId, mode, type, severity, reason } = req.body;

@@ -66,6 +66,9 @@
                         :result="riskResult"
                         :loading="riskLoading"
                         :can-refresh="Boolean(selectedEvaluation.active)"
+                        :empty-text="selectedEvaluation.active
+                            ? 'Risk has not been calculated for this evaluation.'
+                            : 'Risk was not calculated for this evaluation.'"
                         @refresh="refreshRisk"
                     />
                     <user-activity

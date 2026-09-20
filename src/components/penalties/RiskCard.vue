@@ -3,7 +3,7 @@
         <div class="card-body">
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                 <div class="d-flex flex-wrap align-items-center gap-2">
-                    <b>Evaluation Risk</b>
+                    <b>{{ title }}</b>
                     <span
                         v-if="result"
                         class="badge rounded-pill risk-level-badge"
@@ -103,9 +103,7 @@
                 Calculating evaluation risk...
             </p>
             <p v-else class="small text-secondary mb-0 mt-2">
-                {{ canRefresh
-                    ? 'Risk has not been calculated for this evaluation.'
-                    : 'Risk was not calculated for this evaluation.' }}
+                {{ emptyText }}
             </p>
         </div>
     </div>
@@ -126,6 +124,18 @@ export default {
         canRefresh: {
             type: Boolean,
             default: false,
+        },
+        title: {
+            type: String,
+            default: 'Evaluation Risk',
+        },
+        emptyText: {
+            type: String,
+            default: 'Risk has not been calculated yet.',
+        },
+        breakdownId: {
+            type: String,
+            default: '',
         },
     },
     emits: ['refresh'],
@@ -209,8 +219,9 @@ export default {
             const stamp = this.result && this.result.calculatedAt
                 ? String(this.result.calculatedAt).replace(/[^0-9]/g, '')
                 : 'current';
+            const suffix = this.breakdownId ? this.breakdownId + '-' : '';
 
-            return 'riskBreakdown-' + stamp;
+            return 'riskBreakdown-' + suffix + stamp;
         },
         mainSignals() {
             const contributors = (this.result && this.result.contributors) || [];

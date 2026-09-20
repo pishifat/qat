@@ -7,6 +7,11 @@
         <div v-if="selectedUser" class="container">
             <duration />
 
+            <user-risk
+                v-if="loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat) && selectedUser.isBnOrNat"
+                :refresh-nonce="penaltyNonce"
+            />
+
             <div v-if="!selectedUser.isBn && !selectedUser.isNat && selectedUser.history.length">
                 <hr>
                 <user-activity
@@ -95,7 +100,10 @@
                 <hr>
                 <notes />
                 <hr>
-                <user-penalties :refresh-nonce="penaltyNonce" />
+                <user-penalties
+                    :refresh-nonce="penaltyNonce"
+                    @changed="onPenaltyChanged"
+                />
             </div>
 
             <debug-view-document
@@ -112,6 +120,7 @@ import ModalHeader from './info/ModalHeader.vue';
 import Duration from './info/Duration.vue';
 import Notes from './info/Notes.vue';
 import UserPenalties from './info/UserPenalties.vue';
+import UserRisk from './info/UserRisk.vue';
 import DiscordId from './info/DiscordId.vue';
 import NextEvaluation from './info/NextEvaluation.vue';
 import BnEvaluatorToggle from './info/BnEvaluatorToggle.vue';
@@ -135,6 +144,7 @@ export default {
         Duration,
         Notes,
         UserPenalties,
+        UserRisk,
         DiscordId,
         NextEvaluation,
         BnEvaluatorToggle,
@@ -167,14 +177,10 @@ export default {
             penaltyNonce: 0,
         };
     },
-    provide() {
-        return {
-            onPenaltyChanged: () => {
-                this.penaltyNonce += 1;
-            },
-        };
-    },
     methods: {
+        onPenaltyChanged() {
+            this.penaltyNonce += 1;
+        },
         getUserLastHistoryDate() {
             return this.selectedUser.history[this.selectedUser.history.length - 1].date;
         },

@@ -8,6 +8,7 @@
             :initial-mode="defaultMode"
             :can-create="Boolean(gameplayModes.length)"
             :refresh-nonce="refreshNonce"
+            @changed="$emit('changed')"
         />
     </div>
 </template>
@@ -27,6 +28,7 @@ export default {
             default: 0,
         },
     },
+    emits: ['changed'],
     computed: {
         ...mapState(['loggedInUser']),
         ...mapGetters('users', ['selectedUser']),

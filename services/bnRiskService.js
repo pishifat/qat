@@ -13,6 +13,12 @@ function isGameplayMode(mode) {
     return GAMEPLAY_MODES.includes(mode);
 }
 
+function gameplayModesForUser(user) {
+    const current = (user && user.modes) || [];
+
+    return [...new Set(current.filter(isGameplayMode))];
+}
+
 /** Same lookback as UserActivity: deadline − (activityToCheck + 7), default 90 + 7. */
 function evalActivityWindow(evaluation = {}) {
     const maxDate = evaluation.deadline ? new Date(evaluation.deadline) : new Date();
@@ -272,4 +278,5 @@ module.exports = {
     attachRiskBadges,
     recalcForAiessEvent,
     isGameplayMode,
+    gameplayModesForUser,
 };
