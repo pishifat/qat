@@ -15,9 +15,12 @@
                     osu!mania
                 </option>
             </select>
+            <button class="btn btn-sm btn-primary" :disabled="loading" @click="load()">
+                {{ loading ? 'Loading...' : 'Load risk' }}
+            </button>
         </div>
 
-        <div v-if="sync.inProgress" class="mb-3">
+        <div v-if="loaded && sync.inProgress" class="mb-3">
             <div class="d-flex justify-content-between small text-secondary mb-1">
                 <span>Syncing</span>
                 <span>{{ sync.current }} / {{ sync.total }} synced</span>
@@ -101,11 +104,8 @@ export default {
     },
     watch: {
         mode() {
-            this.load();
+            if (this.loaded) this.load();
         },
-    },
-    created() {
-        this.load();
     },
     beforeUnmount() {
         this.stopPoll();
