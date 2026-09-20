@@ -1,7 +1,10 @@
 const STOPS = [
     { at: 0, rgb: [110, 191, 101] },
-    { at: 30, rgb: [243, 156, 18] },
-    { at: 60, rgb: [231, 76, 60] },
+    { at: 15, rgb: [155, 200, 78] },
+    { at: 30, rgb: [212, 208, 74] },
+    { at: 50, rgb: [243, 156, 18] },
+    { at: 70, rgb: [231, 76, 60] },
+    { at: 85, rgb: [199, 58, 46] },
     { at: 100, rgb: [176, 42, 32] },
 ];
 
@@ -57,9 +60,11 @@ export function riskColor(score, level) {
 }
 
 export function riskBadgeTextColor(score, level) {
-    const n = resolveRiskScore(score, level);
+    const rgb = riskColorRgb(score, level);
 
-    if (n == null) return '#fff';
+    if (!rgb) return '#fff';
 
-    return n >= 30 && n < 60 ? '#222' : '#fff';
+    const luminance = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+
+    return luminance > 0.55 ? '#222' : '#fff';
 }
