@@ -17,6 +17,19 @@
             </select>
         </div>
 
+        <div v-if="sync.inProgress" class="mb-3">
+            <div class="d-flex justify-content-between small text-secondary mb-1">
+                <span>Syncing</span>
+                <span>{{ sync.current }} / {{ sync.total }} synced</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div
+                    class="progress-bar bg-bright-blue"
+                    :style="{ width: syncPct + '%' }"
+                />
+            </div>
+        </div>
+
         <p v-if="loaded" class="small text-secondary mb-2">
             Last updated: {{ lastUpdatedLabel }}
             <br>
@@ -59,8 +72,14 @@ export default {
             users: [],
             lastUpdated: null,
             nextUpdate: null,
+            sync: {
+                inProgress: false,
+                current: 0,
+                total: 0,
+            },
             loading: false,
             loaded: false,
+            pollTimer: null,
         };
     },
     computed: {
@@ -74,6 +93,11 @@ export default {
 
             return this.toRelativeDate(this.nextUpdate) + ' (' + this.toStandardDetailedDate(this.nextUpdate) + ')';
         },
+        syncPct() {
+            if (!this.sync.total) return 0;
+
+            return Math.min(100, (this.sync.current / this.sync.total) * 100);
+        },
     },
     watch: {
         mode() {
@@ -83,12 +107,26 @@ export default {
     created() {
         this.load();
     },
+    beforeUnmount() {
+        this.stopPoll();
+    },
     methods: {
         scoreColor(score) {
             return riskColor(score) || '';
         },
-        async load() {
-            this.loading = true;
+        startPoll() {
+            if (this.pollTimer) return;
+
+            this.pollTimer = setInterval(() => this.load(true), 2500);
+        },
+        stopPoll() {
+            if (!this.pollTimer) return;
+
+            clearInterval(this.pollTimer);
+            this.pollTimer = null;
+        },
+        async load(quiet) {
+            if (!quiet) this.loading = true;
 
             const data = await this.$http.executeGet('/users/findModeRisk?mode=' + this.mode);
 
@@ -96,7 +134,11 @@ export default {
                 this.users = data.users || [];
                 this.lastUpdated = data.lastUpdated || null;
                 this.nextUpdate = data.nextUpdate || null;
+                this.sync = data.sync || { inProgress: false, current: 0, total: 0 };
                 this.loaded = true;
+
+                if (this.sync.inProgress) this.startPoll();
+                else this.stopPoll();
             }
 
             this.loading = false;

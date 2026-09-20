@@ -291,63 +291,104 @@ function nextUserRiskSync(from = new Date()) {
     return next;
 }
 
-async function syncAllUserRisks() {
-    const now = new Date();
-    const keep = [];
-    let updated = 0;
-    let failed = 0;
+const userRiskSyncStatus = {
+    inProgress: false,
+    current: 0,
+    total: 0,
+    startedAt: null,
+    finishedAt: null,
+    failed: 0,
+};
+
+function getUserRiskSyncStatus() {
+    return { ...userRiskSyncStatus };
+}
+
+async function countUserRiskSyncTargets() {
+    let total = 0;
 
     for (const mode of GAMEPLAY_MODES) {
-        const users = await User.find({
+        total += await User.countDocuments({
             groups: { $in: ['bn', 'nat'] },
             'modesInfo.mode': mode,
-        }).select('username osuId modesInfo groups');
-
-        for (const user of users) {
-            try {
-                const risk = await calculateBnRisk(user.id, mode);
-
-                if (risk.error) {
-                    failed += 1;
-                    continue;
-                }
-
-                await UserRisk.findOneAndUpdate(
-                    { user: user.id, mode },
-                    {
-                        score: risk.score,
-                        level: risk.level,
-                        limitedHistory: Boolean(risk.limitedHistory),
-                        calculatedAt: now,
-                    },
-                    { upsert: true }
-                );
-
-                keep.push({ user: user.id, mode });
-                updated += 1;
-            } catch (error) {
-                failed += 1;
-                console.log(`[risk] user sync failed ${user.username} ${mode}: ${error}`);
-            }
-
-            await util.sleep(1000);
-        }
-    }
-
-    if (keep.length) {
-        await UserRisk.deleteMany({
-            $nor: keep.map(entry => ({ user: entry.user, mode: entry.mode })),
         });
     }
 
-    console.log(`[risk] user risk sync: ${updated} updated, ${failed} failed`);
+    return total;
+}
 
-    return {
-        updated,
-        failed,
-        calculatedAt: now,
-        nextUpdate: nextUserRiskSync(now),
-    };
+async function syncAllUserRisks() {
+    if (userRiskSyncStatus.inProgress) {
+        return { error: 'User risk sync already in progress' };
+    }
+
+    const now = new Date();
+    const keep = [];
+    let updated = 0;
+
+    userRiskSyncStatus.current = 0;
+    userRiskSyncStatus.failed = 0;
+    userRiskSyncStatus.startedAt = now;
+    userRiskSyncStatus.finishedAt = null;
+    userRiskSyncStatus.total = await countUserRiskSyncTargets();
+    userRiskSyncStatus.inProgress = true;
+
+    try {
+        for (const mode of GAMEPLAY_MODES) {
+            const users = await User.find({
+                groups: { $in: ['bn', 'nat'] },
+                'modesInfo.mode': mode,
+            }).select('username osuId modesInfo groups');
+
+            for (const user of users) {
+                try {
+                    const risk = await calculateBnRisk(user.id, mode);
+
+                    if (risk.error) {
+                        userRiskSyncStatus.failed += 1;
+                    } else {
+                        await UserRisk.findOneAndUpdate(
+                            { user: user.id, mode },
+                            {
+                                score: risk.score,
+                                level: risk.level,
+                                limitedHistory: Boolean(risk.limitedHistory),
+                                calculatedAt: now,
+                            },
+                            { upsert: true }
+                        );
+
+                        keep.push({ user: user.id, mode });
+                        updated += 1;
+                    }
+                } catch (error) {
+                    userRiskSyncStatus.failed += 1;
+                    console.log(`[risk] user sync failed ${user.username} ${mode}: ${error}`);
+                }
+
+                userRiskSyncStatus.current += 1;
+                await util.sleep(1000);
+            }
+        }
+
+        if (keep.length) {
+            await UserRisk.deleteMany({
+                $nor: keep.map(entry => ({ user: entry.user, mode: entry.mode })),
+            });
+        }
+
+        console.log(`[risk] user risk sync: ${updated} updated, ${userRiskSyncStatus.failed} failed`);
+
+        return {
+            updated,
+            failed: userRiskSyncStatus.failed,
+            calculatedAt: now,
+            nextUpdate: nextUserRiskSync(now),
+        };
+    } finally {
+        userRiskSyncStatus.inProgress = false;
+        userRiskSyncStatus.finishedAt = new Date();
+    }
 }
 
 async function getStoredModeRisk(mode) {
@@ -385,6 +426,7 @@ async function getStoredModeRisk(mode) {
         users,
         lastUpdated,
         nextUpdate: nextUserRiskSync(),
+        sync: getUserRiskSyncStatus(),
     };
 }
 
@@ -392,6 +434,7 @@ module.exports = {
     calculateBnRisk,
     getStoredModeRisk,
     syncAllUserRisks,
+    getUserRiskSyncStatus,
     nextUserRiskSync,
     calculateAndStoreForEvaluation,
     storeOnActiveBnEval,
