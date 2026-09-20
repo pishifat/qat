@@ -86,6 +86,9 @@ async function getWebhook(webhook) {
         case 'natUserReport':
             return appendPath(url, config.natReportWebhook);
 
+        case 'aiReport':
+            return appendPath(url, config.aiReportWebhook);
+
         case 'contentCase':
             return appendPath(url, config.contentCasesWebhook);
 

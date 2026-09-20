@@ -93,6 +93,10 @@ export default {
         },
         /** @returns {string} */
         categoryText() {
+            if (this.report.category === 'aiBeatmap') {
+                return 'AI beatmap';
+            }
+
             let word = this.report.category;
 
             word = word.replace(/([a-z])([A-Z])/g, '$1 $2');

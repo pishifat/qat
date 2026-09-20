@@ -60,6 +60,8 @@ export default {
                     return 'Stolen beatmap';
                 case 'beatmap':
                     return 'Beatmap';
+                case 'aiBeatmap':
+                    return 'AI beatmap';
                 case 'contentCaseSong':
                     return 'Inappropriate song';
                 case 'contentCaseVisual':

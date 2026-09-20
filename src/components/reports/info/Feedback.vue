@@ -6,7 +6,9 @@
             </p>
 
             <p class="small ms-2">
-                This will be sent to the reporter in an osu! message. Include the consensus and any actions being taken.
+                {{ selectedReport.isAiBeatmap
+                    ? 'No message will be sent to the reporter.'
+                    : 'This will be sent to the reporter in an osu! message. Include the consensus and any actions being taken.' }}
             </p>
 
             <textarea
@@ -66,7 +68,9 @@
                     class="btn btn-sm btn-success mx-1"
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    title="Generates feedback PM and stores feedback/validity inputs"
+                    :title="selectedReport.isAiBeatmap
+                        ? 'Stores feedback/validity inputs'
+                        : 'Generates feedback PM and stores feedback/validity inputs'"
                     @click="submitReportEval($event);"
                 >
                     Save Report Evaluation
@@ -114,18 +118,23 @@ export default {
             this.vote = this.selectedReport.valid;
         },
         async submitReportEval (e, close) {
-            if (close && (!this.vote || (!this.feedback || !this.feedback.length))) {
+            const isAiBeatmap = this.selectedReport.isAiBeatmap;
+
+            if (close && !isAiBeatmap && (!this.vote || (!this.feedback || !this.feedback.length))) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `Cannot leave fields blank!`,
                     type: 'danger',
                 });
-            } else if (!this.vote && (!this.feedback || !this.feedback.length)) {
+            } else if (!close && !this.vote && (!this.feedback || !this.feedback.length)) {
                 this.$store.dispatch('updateToastMessages', {
                     message: `At least one field must have input!`,
                     type: 'danger',
                 });
             } else {
-                if (close && !confirm(`Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`)) {
+                if (close && !confirm(isAiBeatmap
+                    ? `Are you sure? Doing this will reveal the reporter.`
+                    : `Are you sure? Report feedback cannot be edited after closing. Doing this will reveal the reporter.`
+                )) {
                     return;
                 }
 

@@ -48,8 +48,16 @@ router.get('/search/:user', async (req, res) => {
 router.get('/searchRecent/:limit', async (req, res) => {
     const limit = parseInt(req.params.limit);
 
+    const find = { isActive: false };
+
+    if (req.query.ai === 'true') {
+        find.category = 'aiBeatmap';
+    } else {
+        find.category = { $ne: 'aiBeatmap' };
+    }
+
     const closedReports = await Report
-        .find({ isActive: false })
+        .find(find)
         .populate(defaultPopulate)
         .sort({ createdAt: -1 })
         .limit(limit);
@@ -155,7 +163,7 @@ router.post('/submitReportEval/:id', async (req, res) => {
             description: `Adjusted ${req.body.close ? 'status' : 'feedback'} on [**${report.culprit ? 'report for ' + report.culprit.username : report.reportCategory}**](http://bn.mappersguild.com/managereports?id=${report.id})`,
             fields,
         }],
-        'natUserReport'
+        report.isAiBeatmap ? 'aiReport' : 'natUserReport'
     );
 });
 
@@ -269,6 +277,10 @@ router.post('/sendMessages/:id', async (req, res) => {
         .findById(req.params.id)
         .populate(defaultPopulate)
         .orFail();
+
+    if (report.isAiBeatmap) {
+        return res.json({ error: 'Messages cannot be sent for AI beatmap reports' });
+    }
 
     req.body.users.push({ osuId: req.session.osuId });
 

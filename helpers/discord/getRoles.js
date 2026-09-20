@@ -92,6 +92,11 @@ async function getRoles(roles) {
             case 'maniaBeatmapReport':
                 pings += `<@&${config.beatmapReportWebhook.maniaRole}> `;
                 break;
+            case 'aiReport':
+                if (config.aiReportWebhook && config.aiReportWebhook.role) {
+                    pings += `<@&${config.aiReportWebhook.role}> `;
+                }
+                break;
             case 'securityCheck':
                 pings += `<@&${config.securityCheckWebhook.role}> `;
                 break;

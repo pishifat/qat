@@ -271,7 +271,7 @@ const notifyReports = cron.schedule('0 17 * * *', async () => {
 
     // find overdue reports
     const activeReports = await Report
-        .find({ isActive: true, createdAt: { $lt: sevenDaysAgo } })
+        .find({ isActive: true, category: { $ne: 'aiBeatmap' }, createdAt: { $lt: sevenDaysAgo } })
         .populate({ path: 'culprit', select: 'username osuId modesInfo' });
 
     // post webhook for reports

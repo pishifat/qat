@@ -40,6 +40,9 @@
                         <option value="beatmap">
                             Beatmap
                         </option>
+                        <option value="aiBeatmap">
+                            AI beatmap
+                        </option>
                         <option value="other">
                             Other
                         </option>
@@ -55,11 +58,24 @@
                 </div>
 
                 <div v-if="category == 'behavior'">
-                    Before submitting a behavior report, check the <a href="https://osu.ppy.sh/wiki/Reporting_bad_behaviour" target="_blank">reporting policy on the osu! wiki</a>.
+                    <p>Before submitting a behavior report, check the <a href="https://osu.ppy.sh/wiki/Reporting_bad_behaviour" target="_blank">reporting policy on the osu! wiki</a>.</p>
+                    <p>If you want to report a a user for AI beatmapping, please set the report type to "AI beatmap".</p>
                 </div>
 
                 <div v-if="category == 'beatmap'">
-                    If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> from as per osu!'s <a href="https://osu.ppy.sh/legal/Copyright" target="_blank">copyright policy</a>. Your notice should come from the email address linked to your osu! account.
+                    <p>If a beatmap you created is stolen and you want it removed from the beatmap listing, send notice to <code>copyright@ppy.sh</code> from as per osu!'s <a href="https://osu.ppy.sh/legal/Copyright" target="_blank">copyright policy</a>. Your notice should come from the email address linked to your osu! account.</p>
+                    <p>If you want to report a beatmap for AI usage, please set the report type to "AI beatmap".</p>
+                </div>
+
+                <div v-if="category == 'aiBeatmap'" class="row mb-2">
+                    <div class="col-sm-12">
+                        <p>The NAT does not handle these reports in any way. They go directly to the people responsible for handling AI beatmap reports. <b>Do not expect a response.</b></p>
+                        <p>Please only report Ranked beatmaps or soon-to-be-qualified beatmaps.</p>
+                    </div>
+                </div>
+
+                <div v-if="category == 'other'">
+                    <p>If you want to report a user or a beatmap for AI usage, please set the report type to "AI beatmap".</p>
                 </div>
 
                 <div v-if="category == 'nat'">
@@ -224,6 +240,7 @@ export default {
                 case 'stolenBeatmap':
                     return 'Link to stolen beatmap:';
                 case 'beatmap':
+                case 'aiBeatmap':
                     return 'Link to beatmap:';
                 case 'contentCaseSong':
                     return 'Link to song or beatmap:';
@@ -323,7 +340,9 @@ export default {
             }, e);
 
             if (this.$http.isValid(data)) {
-                this.successInfo = 'Your report has been submitted! Its outcome will be sent to you via osu! chat';
+                this.successInfo = this.category == 'aiBeatmap'
+                    ? 'Your report has been submitted! You should not expect a response.'
+                    : 'Your report has been submitted! Its outcome will be sent to you via osu! chat';
             }
         },
     },

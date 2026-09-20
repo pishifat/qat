@@ -2,18 +2,31 @@
     <div class="row">
         <div class="col-md-12">
             <section class="card card-body">
-                <h2>Open Reports</h2>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="mb-0">Open Reports</h2>
+                    <div class="form-check mb-0">
+                        <input
+                            id="showAiReports"
+                            v-model="showAiReports"
+                            class="form-check-input"
+                            type="checkbox"
+                        >
+                        <label class="form-check-label text-secondary" for="showAiReports">
+                            Show AI reports
+                        </label>
+                    </div>
+                </div>
 
                 <transition-group name="list" tag="div" class="row">
                     <report-card
-                        v-for="report in openReports"
+                        v-for="report in displayedOpenReports"
                         :key="report.id"
                         :report="report"
                         @update:selected-report="selectedReport = $event"
                     />
                 </transition-group>
 
-                <p v-if="!openReports || openReports.length == 0" class="ms-4">
+                <p v-if="!displayedOpenReports.length" class="ms-4">
                     No open reports...
                 </p>
             </section>
@@ -54,13 +67,13 @@
                 <template v-if="isQueried">
                     <transition-group name="list" tag="div" class="row">
                         <report-card
-                            v-for="report in closedReports"
+                            v-for="report in displayedClosedReports"
                             :key="report.id"
                             :report="report"
                         />
                     </transition-group>
 
-                    <p v-if="!closedReports || closedReports.length == 0" class="ms-4 mt-2">
+                    <p v-if="!displayedClosedReports.length" class="ms-4 mt-2">
                         No closed reports...
                     </p>
                 </template>
@@ -91,6 +104,8 @@ export default {
         return {
             searchValue: null,
             limit: null,
+            showAiReports: false,
+            lastClosedSearch: null,
         };
     },
     computed: {
@@ -99,6 +114,19 @@ export default {
             'closedReports',
             'isQueried',
         ]),
+        displayedOpenReports () {
+            return this.filterReports(this.openReports);
+        },
+        displayedClosedReports () {
+            return this.filterReports(this.closedReports);
+        },
+    },
+    watch: {
+        showAiReports () {
+            if (this.isQueried && this.lastClosedSearch === 'recent' && parseInt(this.limit)) {
+                this.queryRecent();
+            }
+        },
     },
     beforeCreate () {
         if (!this.$store.hasModule('manageReports')) {
@@ -117,12 +145,20 @@ export default {
                 const i = this.openReports.findIndex(r => r.id == id);
 
                 if (i >= 0) {
+                    if (this.openReports[i].category === 'aiBeatmap') {
+                        this.showAiReports = true;
+                    }
+
                     this.$store.commit('manageReports/setSelectedReportId', id);
                     $('#reportInfo').modal('show');
                 } else {
                     const report = await this.$http.executeGet(`/manageReports/searchById/${id}`);
 
                     if (report && !report.error) {
+                        if (report.category === 'aiBeatmap') {
+                            this.showAiReports = true;
+                        }
+
                         this.$store.commit('manageReports/setClosedReports', [report]);
                         this.$store.commit('manageReports/setSelectedReportId', id);
                         this.$store.commit('manageReports/setIsQueried', true);
@@ -138,6 +174,14 @@ export default {
         }
     },
     methods: {
+        filterReports (reports) {
+            if (!reports || !reports.length) return [];
+
+            return reports.filter(report => this.showAiReports
+                ? report.category === 'aiBeatmap'
+                : report.category !== 'aiBeatmap'
+            );
+        },
         updateReports (data) {
             if (this.$http.isValid(data)) {
                 this.$store.commit('manageReports/setIsQueried', true);
@@ -159,6 +203,7 @@ export default {
                     this.$router.replace(`/managereports?user=${this.searchValue}`);
                 }
 
+                this.lastClosedSearch = 'user';
                 const data = await this.$http.executeGet('/manageReports/search/' + this.searchValue, e);
                 this.updateReports(data);
             }
@@ -170,7 +215,9 @@ export default {
                     type: 'danger',
                 });
             } else {
-                const data = await this.$http.executeGet('/manageReports/searchRecent/' + this.limit, e);
+                this.lastClosedSearch = 'recent';
+                const aiQuery = this.showAiReports ? '?ai=true' : '';
+                const data = await this.$http.executeGet('/manageReports/searchRecent/' + this.limit + aiQuery, e);
                 this.updateReports(data);
             }
         },

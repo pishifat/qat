@@ -12,6 +12,7 @@ interface IReportDocument extends Document {
     category: string;
     reportCategory: string; // formatted verison of category fetched from category
     isContentCase: boolean; // populated field
+    isAiBeatmap: boolean;
     createdAt: Date;
 }
 

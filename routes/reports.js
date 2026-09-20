@@ -55,6 +55,35 @@ router.post('/submitReport/', async (req, res) => {
         });
     }
 
+    if (req.body.category == 'aiBeatmap') {
+        if (!validUrl) {
+            return res.json({
+                error: 'Invalid link',
+            });
+        }
+
+        await report.save();
+
+        res.json({
+            success: 'Sent!',
+        });
+
+        await discord.highlightWebhookPost('', [{
+            color: discord.webhookColors.darkRed,
+            description: `New [${report.reportCategory}](http://bn.mappersguild.com/managereports?id=${report.id})`,
+            fields: notificationFields,
+        }], 'aiReport');
+
+        Logger.generate(
+            null,
+            'Submitted AI beatmap report',
+            'report',
+            report._id
+        );
+
+        return;
+    }
+
     if (req.body.username) {
         let u = await User.findByUsername(req.body.username);
 

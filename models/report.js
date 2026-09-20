@@ -8,7 +8,7 @@ const reportSchema = new mongoose.Schema({
     valid: { type: Number, enum: [1, 2, 3] },
     feedback: { type: String },
     isActive: { type: Boolean, default: true },
-    category: { type: String, enum: ['stolenBeatmap', 'beatmap', 'contentCaseSong', 'contentCaseVisual', 'behavior', 'other'] },
+    category: { type: String, enum: ['stolenBeatmap', 'beatmap', 'aiBeatmap', 'contentCaseSong', 'contentCaseVisual', 'behavior', 'other'] },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 class ReportService extends mongoose.Model {
@@ -18,6 +18,8 @@ class ReportService extends mongoose.Model {
                 return 'stolen beatmap report';
             case 'beatmap':
                 return 'beatmap report';
+            case 'aiBeatmap':
+                return 'AI beatmap report';
             case 'contentCaseSong':
                 return 'song content report';
             case 'contentCaseVisual':
@@ -33,6 +35,10 @@ class ReportService extends mongoose.Model {
         if (this.category == 'contentCaseSong' || this.category == 'contentCaseVisual') {
             return true;
         }
+    }
+
+    get isAiBeatmap () {
+        return this.category == 'aiBeatmap';
     }
 }
 

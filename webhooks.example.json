@@ -57,6 +57,11 @@
         "id": "",
         "token": ""
     },
+    "aiReportWebhook": {
+        "id": "",
+        "token": "",
+        "role": ""
+    },
     "contentCasesWebhook": {
         "id": "",
         "token": ""
