@@ -93,6 +93,9 @@ export default {
 
                 i = state.nominationsPopped.findIndex(e => e._id == event.id);
                 if (i >= 0) state.nominationsPopped[i][event.modifiedField] = event.value;
+            } else if (event.type == 'nominate' || event.type == 'qualify') {
+                i = state.nominations.findIndex(e => e._id == event.id);
+                if (i >= 0) state.nominations[i][event.modifiedField] = event.value;
             }
         },
     },

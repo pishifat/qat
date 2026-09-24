@@ -185,12 +185,15 @@ export default {
                     '/dataCollection/toggleIsReviewed/' + event._id,
                     {}
                 );
-                this.$store.commit('dataCollection/updateEvent', {
-                    id: event._id,
-                    type: event.type,
-                    modifiedField: 'isReviewed',
-                    value: data.isReviewed,
-                });
+
+                if (this.$http.isValid(data)) {
+                    this.$store.commit('activity/updateEvent', {
+                        id: event._id,
+                        type: event.type,
+                        modifiedField: 'isReviewed',
+                        value: data.isReviewed,
+                    });
+                }
                 this.processing = false;
             }
         },

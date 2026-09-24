@@ -70,7 +70,7 @@ router.post('/toggleIsReviewed/:id', middlewares.isNatOrTrialNat, async (req, re
 
     res.json({
         isReviewed: a.isReviewed,
-        success: 'Toggled reviewed status. Refresh to see changes',
+        success: 'Toggled reviewed status',
     });
 
     Logger.generate(req.session.mongoId, `Toggled review status of s/${a.beatmapsetId} to ${a.isReviewed}`, 'dataCollection', a._id);

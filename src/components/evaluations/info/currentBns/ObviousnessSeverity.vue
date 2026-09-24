@@ -46,7 +46,6 @@
                 </a>
             </li>
         </ul>
-        <small v-if="isNominationResetEditing && changed" class="small text-secondary">(refresh to see changes)</small>
     </div>
 </template>
 
@@ -75,37 +74,30 @@ export default {
             default: false,
         },
     },
-    data() {
-        return {
-            changed: false,
-        };
-    },
     methods: {
         async updateObviousness(obviousness) {
             let data = await this.$http.executePost('/dataCollection/updateObviousness/' + this.eventId, { obviousness });
 
             if (this.$http.isValid(data)) {
-                this.$store.commit('dataCollection/updateEvent', {
-                    id: this.eventId,
-                    type: this.type,
-                    modifiedField: 'obviousness',
-                    value: data.obviousness,
-                });
-                this.changed = true;
+                this.commitField('obviousness', data.obviousness);
             }
         },
         async updateSeverity(severity) {
             let data = await this.$http.executePost('/dataCollection/updateSeverity/' + this.eventId, { severity });
 
             if (this.$http.isValid(data)) {
-                this.$store.commit('dataCollection/updateEvent', {
-                    id: this.eventId,
-                    type: this.type,
-                    modifiedField: 'severity',
-                    value: data.severity,
-                });
-                this.changed = true;
+                this.commitField('severity', data.severity);
             }
+        },
+        commitField(modifiedField, value) {
+            const store = this.isNominationResetEditing ? 'activity' : 'dataCollection';
+
+            this.$store.commit(`${store}/updateEvent`, {
+                id: this.eventId,
+                type: this.type,
+                modifiedField,
+                value,
+            });
         },
     },
 };
