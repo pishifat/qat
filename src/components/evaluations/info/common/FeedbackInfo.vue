@@ -5,23 +5,15 @@
                 <b>Additional feedback:</b>
             </div>
 
-            <div class="row">
-                <div class="col-sm-6">
-                    <textarea
-                        v-model="feedback"
-                        :class="feedback != selectedEvaluation.feedback ? 'bg-dark' : ''"
-                        class="form-control mb-2"
-                        :rows="getRows()"
-                        placeholder="optional..."
-                    />
-                </div>
-                <div class="col-sm-6 mb-2">
-                    <div v-if="feedback && feedback.length" class="small card card-body v-html-content" v-html="$md.render(feedback)" />
-                    <div v-else class="small card card-body text-secondary">
-                        feedback preview
-                    </div>
-                </div>
-            </div>
+            <markdown-editor
+                ref="editor"
+                v-model="feedback"
+                class="mb-2"
+                :storage-key="'md:feedback:' + selectedEvaluation.id"
+                :rows="getRows()"
+                placeholder="optional..."
+                :input-class="feedback != selectedEvaluation.feedback ? 'bg-dark' : ''"
+            />
 
             <b v-if="feedback && feedback.length > 500" class="text-warning float-end">{{ feedback.length }}</b>
 
@@ -70,14 +62,16 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import evaluations from '../../../../mixins/evaluations.js';
 import FeedbackPm from './FeedbackPm.vue';
+import MarkdownEditor from '../../../MarkdownEditor.vue';
 
 export default {
     name: 'FeedbackInfo',
     components: {
         FeedbackPm,
+        MarkdownEditor,
     },
     mixins: [evaluations],
     data() {
@@ -88,7 +82,6 @@ export default {
         };
     },
     computed: {
-        ...mapState('evaluations', ['previewFeedback']),
         ...mapGetters('evaluations', ['selectedEvaluation']),
 
         /** @returns {string} */
@@ -115,6 +108,7 @@ export default {
             );
 
             if (result && !result.error) {
+                this.$refs.editor.clearDraft();
                 this.$store.commit('evaluations/updateEvaluation', result);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Saved feedback`,

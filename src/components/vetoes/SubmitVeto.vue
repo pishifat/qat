@@ -72,18 +72,14 @@
                 <b>Add veto reason</b> will update the list above. When all reasons are added, click <b>Submit</b>.
             </p>
 
-            <textarea
+            <markdown-editor
+                ref="editor"
                 v-model="summary"
-                type="text"
-                class="form-control mb-1"
-                rows="3"
+                class="mb-1"
+                storage-key="md:veto-summary"
+                :rows="3"
                 placeholder="veto reason..."
             />
-
-            <div v-if="summary.length" class="small mb-2">
-                <b>Preview</b> (<a href="https://www.markdownguide.org/basic-syntax/" target="_blank">markdown</a> is supported!)
-                <div class="small card card-body v-html-content" v-html="$md.render(summary)" />
-            </div>
 
 
             <button type="submit" class="btn btn-primary w-100" @click="addReason()">
@@ -101,6 +97,7 @@
 <script>
 import ModalDialog from '../ModalDialog.vue';
 import ModeSelect from '../ModeSelect.vue';
+import MarkdownEditor from '../MarkdownEditor.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -108,6 +105,7 @@ export default {
     components: {
         ModalDialog,
         ModeSelect,
+        MarkdownEditor,
     },
     data() {
         return {
@@ -135,6 +133,7 @@ export default {
                     id: new Date().getTime(), // unique number
                     summary: this.summary,
                 });
+                this.$refs.editor.clearDraft();
             }
 
             this.summary = '';
@@ -177,6 +176,7 @@ export default {
                 );
 
                 if (this.$http.isValid(data)) {
+                    this.$refs.editor.clearDraft();
                     $('#addVeto').modal('hide');
                     this.$store.commit('vetoes/addVeto', data.veto);
                 }

@@ -216,13 +216,14 @@
                             </div>
                         </div>
 
-                        <textarea
+                        <markdown-editor
+                            :ref="(el) => setReasonEditor(i - 1, el)"
                             v-model="reasons[i - 1]"
-                            type="text"
-                            class="form-control ms-2 mb-2"
+                            class="ms-2 mb-2"
+                            :storage-key="'md:application-reason:' + (i - 1)"
                             placeholder="response"
                             maxlength="1000"
-                            rows="2"
+                            :rows="2"
                             :disabled="!loggedInUser"
                         />
 
@@ -375,6 +376,7 @@ import ToastMessages from '../components/ToastMessages.vue';
 import ModeSelect from '../components/ModeSelect.vue';
 import ModeDisplay from '../components/ModeDisplay.vue';
 import ProgressBar from '../components/evaluations/info/common/ProgressBar.vue';
+import MarkdownEditor from '../components/MarkdownEditor.vue';
 import { mapState } from 'vuex';
 import evaluations from '../mixins/evaluations';
 
@@ -385,6 +387,7 @@ export default {
         ModeSelect,
         ModeDisplay,
         ProgressBar,
+        MarkdownEditor,
     },
     mixins: [ evaluations ],
     data() {
@@ -397,6 +400,7 @@ export default {
             selectedMode: '',
             mods: [],
             reasons: [],
+            reasonEditors: [],
             oszs: [],
             comment: '',
             isPublic: false,
@@ -452,6 +456,9 @@ export default {
         totalByModeOverdue(mode) {
             return this.totalActiveApplications.filter(a => a.mode == mode && new Date(a.deadline) < new Date()).length;
         },
+        setReasonEditor(index, editor) {
+            this.reasonEditors[index] = editor;
+        },
         missingInput(array) {
             if (array.length < 3 || !array[0] || !array[1] || !array[2]) {
                 return true;
@@ -496,6 +503,7 @@ export default {
                     this.successInfo = '';
 
                     if (application && !application.error) {
+                        this.reasonEditors.forEach(editor => editor && editor.clearDraft());
                         this.activeApps.push(application);
                         this.step = 1;
                         this.mods = [];

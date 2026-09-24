@@ -73,33 +73,17 @@
             <div>
                 Message:
 
-                <textarea
+                <markdown-editor
+                    ref="announcementEditor"
                     v-model="announcement"
-                    class="form-control form-control-sm"
-                    type="text"
-                    rows="4"
+                    storage-key="md:spam-announcement"
+                    input-class="form-control-sm"
+                    :rows="4"
                 />
             </div>
 
-            <div
-                v-if="title.length && announcement.length"
-                class="mt-2"
-                data-bs-toggle="tooltip"
-                data-bs-placement="left"
-                title="only the first image will appear on the discord announcement"
-            >
-                <hr>
-                Preview:
-                <div
-                    class="pre-line"
-                    :class="announcement.length > 4096 ? 'text-danger' : 'text-secondary'"
-                >
-                    <b v-for="role in roles" :key="role">@{{ role }} </b>
-                    <b>{{ title }}</b>
-                    <span class="small v-html-content" v-html="$md.render(announcement)" />
-                </div>
-                <b v-if="announcement.length > 4096">TOO MANY CHARACTERS FOR DISCORD. shorten message pls</b>
-                <hr>
+            <div v-if="announcement.length > 4096" class="mt-2">
+                <b>TOO MANY CHARACTERS FOR DISCORD. shorten message pls</b>
             </div>
 
             <button v-if="announcement.length" class="btn btn-danger my-1" @click="sendAnnouncement($event)">
@@ -134,25 +118,16 @@
             <div>
                 Message:
                 <span class="small text-secondary">({{ message.length }}/1024)</span>
-                <textarea
+                <markdown-editor
+                    ref="messageEditor"
                     v-model="message"
-                    class="form-control form-control-sm"
-                    type="text"
-                    rows="4"
+                    storage-key="md:spam-message"
+                    input-class="form-control-sm"
+                    :rows="4"
                 />
             </div>
 
-            <div v-if="messageChannelTitle.length && message.length" class="mt-2">
-                <hr>
-                Preview:
-                <div
-                    class="pre-line"
-                    :class="message.length > 1024 ? 'text-danger' : 'text-secondary'"
-                >
-                    <span class="small v-html-content" v-html="$md.render(message)" />
-                    <b v-if="message.length > 1024">TOO MANY CHARACTERS. shorten message pls</b>
-                </div>
-            </div>
+            <b v-if="message.length > 1024" class="text-danger">TOO MANY CHARACTERS. shorten message pls</b>
 
             <hr>
 
@@ -226,11 +201,13 @@
 <script>
 import { mapState } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
+import MarkdownEditor from '../components/MarkdownEditor.vue';
 
 export default {
     name: 'Spam',
     components: {
         ToastMessages,
+        MarkdownEditor,
     },
     data () {
         return {
@@ -297,7 +274,8 @@ export default {
                 const result2 = confirm(`Are you really sure? Just double-checking in case you don't read.`);
 
                 if (result2) {
-                    await this.$http.executePost(`/spam/sendMessages/`, { users: this.users, message: this.message, title: this.messageChannelTitle, description: this.messageChannelDescription }, e);
+                    const data = await this.$http.executePost(`/spam/sendMessages/`, { users: this.users, message: this.message, title: this.messageChannelTitle, description: this.messageChannelDescription }, e);
+                    if (this.$http.isValid(data)) this.$refs.messageEditor.clearDraft();
                 }
             }
         },
@@ -308,7 +286,8 @@ export default {
                 const result2 = confirm(`Are you really sure? Just double-checking in case you don't read.`);
 
                 if (result2) {
-                    await this.$http.executePost(`/spam/sendAnnouncement/`, { announcement: this.announcement, title: this.title, roles: this.roles }, e);
+                    const data = await this.$http.executePost(`/spam/sendAnnouncement/`, { announcement: this.announcement, title: this.title, roles: this.roles }, e);
+                    if (this.$http.isValid(data)) this.$refs.announcementEditor.clearDraft();
                 }
             }
         },

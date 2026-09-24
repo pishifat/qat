@@ -42,11 +42,12 @@
 
                 <div>
                     Content:
-                    <textarea
+                    <markdown-editor
+                        ref="editor"
                         v-model="content"
-                        class="form-control form-control-sm"
-                        type="text"
-                        rows="4"
+                        storage-key="md:docs-new"
+                        input-class="form-control-sm"
+                        :rows="4"
                     />
                 </div>
                 <button
@@ -65,11 +66,13 @@
 <script>
 import { mapState } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
+import MarkdownEditor from '../components/MarkdownEditor.vue';
 
 export default {
     name: 'DocumentationIndexPage',
     components: {
         ToastMessages,
+        MarkdownEditor,
     },
     data() {
         return {
@@ -95,6 +98,7 @@ export default {
             }, e);
 
             if (this.$http.isValid(article)) {
+                this.$refs.editor.clearDraft();
                 this.$router.push(`/docs/${article.slug}`);
             }
         },

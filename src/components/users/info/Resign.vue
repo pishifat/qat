@@ -10,10 +10,12 @@
         <div :id="`resign-${mode}`" class="collapse">
             <div class="ms-2 mt-2 mb-2">
                 Anything you want to share with the NAT about your resignation? This is completely optional.
-                <textarea
+                <markdown-editor
+                    ref="editor"
                     v-model="comment"
-                    class="form-control mb-2"
-                    rows="2"
+                    class="mb-2"
+                    :storage-key="'md:resign:' + selectedUser.id + ':' + mode"
+                    :rows="2"
                     maxlength="1000"
                     placeholder="optional..."
                 />
@@ -34,9 +36,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import evaluations from '../../../mixins/evaluations';
+import MarkdownEditor from '../../MarkdownEditor.vue';
 
 export default {
     name: 'BnEvaluatorToggle',
+    components: {
+        MarkdownEditor,
+    },
     mixins: [ evaluations ],
     props: {
         mode: {
@@ -59,10 +65,12 @@ export default {
             const result = confirm(`Are you sure? You will no longer be a Beatmap Nominator for ${this.formatMode(this.mode)}.`);
 
             if (result) {
-                await this.$http.executePost(`/users/resignFromBn/${this.selectedUser.id}`, {
+                const data = await this.$http.executePost(`/users/resignFromBn/${this.selectedUser.id}`, {
                     mode: this.mode,
                     comment: this.comment,
                 }, e);
+
+                if (this.$http.isValid(data)) this.$refs.editor.clearDraft();
             }
         },
     },

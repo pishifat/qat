@@ -22,19 +22,15 @@
                 <b>Comment:</b>
             </div>
             <div class="row mb-3">
-                <div class="col-sm-6">
-                    <textarea
+                <div class="col-sm-12">
+                    <markdown-editor
+                        ref="editor"
                         v-model="comment"
-                        class="form-control mb-2"
-                        rows="2"
+                        class="mb-2"
+                        storage-key="md:add-application"
+                        :rows="2"
                         placeholder="Comment..."
                     />
-                </div>
-                <div class="col-sm-6 mb-2">
-                    <div v-if="comment && comment.length" class="small card card-body v-html-content" v-html="$md.render(comment)" />
-                    <div v-else class="small card card-body text-secondary">
-                        comment preview
-                    </div>
                 </div>
             </div>
             <hr>
@@ -48,12 +44,14 @@
 <script>
 import ModalDialog from '../ModalDialog.vue';
 import ModeSelect from '../ModeSelect.vue';
+import MarkdownEditor from '../MarkdownEditor.vue';
 
 export default {
     name: 'AddApplication',
     components: {
         ModalDialog,
         ModeSelect,
+        MarkdownEditor,
     },
     data() {
         return {
@@ -85,6 +83,8 @@ export default {
                 );
 
                 if (this.$http.isValid(data)) {
+                    this.$refs.editor.clearDraft();
+                    this.comment = '';
                     this.$store.commit('evaluations/setEvaluations', data.applications);
 
                     if (data.applications.length) {

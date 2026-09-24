@@ -104,11 +104,12 @@
                     <div v-else class="small text-secondary">
                         Anything useful for people participating in this discussion
                     </div>
-                    <textarea
+                    <markdown-editor
+                        ref="editor"
                         v-model="shortReason"
-                        class="form-control"
+                        storage-key="md:discussion-reason"
                         placeholder="info..."
-                        rows="2"
+                        :rows="2"
                     />
                 </div>
             </div>
@@ -232,6 +233,7 @@ import { mapState } from 'vuex';
 import ModalDialog from '../ModalDialog.vue';
 import ModeSelect from '../ModeSelect.vue';
 import ToastMessages from '../ToastMessages.vue';
+import MarkdownEditor from '../MarkdownEditor.vue';
 
 export default {
     name: 'SubmitDiscussion',
@@ -239,6 +241,7 @@ export default {
         ModalDialog,
         ModeSelect,
         ToastMessages,
+        MarkdownEditor,
     },
     props: {
         isContentReview: {
@@ -354,6 +357,7 @@ export default {
             );
 
             if (this.$http.isValid(data)) {
+                this.$refs.editor.clearDraft();
                 $('#addDiscussion').modal('hide');
                 this.$store.commit(`${this.storeModule}/addDiscussion`, data.discussion);
             }

@@ -27,11 +27,13 @@
         <!-- content -->
         <div>
             <div v-if="isEditingContent">
-                <textarea
+                <markdown-editor
+                    ref="editor"
                     v-model="newContentInput"
-                    class="form-control form-control-sm mb-2"
-                    type="text"
-                    rows="4"
+                    class="mb-2"
+                    :storage-key="'md:announcement:' + announcement.id"
+                    input-class="form-control-sm"
+                    :rows="4"
                     placeholder="new content"
                 />
                 <button type="submit" class="btn btn-secondary float-end" @click="updateAnnouncement($event)">
@@ -59,9 +61,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import MarkdownEditor from '../MarkdownEditor.vue';
 
 export default {
     name: 'Announcement',
+    components: {
+        MarkdownEditor,
+    },
     props: {
         announcement: {
             type: Object,
@@ -87,6 +93,7 @@ export default {
                 `/updateAnnouncement/` + this.announcement.id, { newTitle: this.newTitleInput, newContent: this.newContentInput }, e);
 
             if (announcement && !announcement.error) {
+                this.$refs.editor.clearDraft();
                 this.$store.commit('announcements/updateAnnouncement', announcement);
                 this.$store.dispatch('updateToastMessages', {
                     message: `Updated announcement`,

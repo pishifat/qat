@@ -126,10 +126,11 @@
                                 {{ reasonSubheader }}
                             </p>
 
-                            <textarea
+                            <markdown-editor
+                                ref="editor"
                                 v-model="reason"
-                                class="form-control"
-                                rows="4"
+                                storage-key="md:report-reason"
+                                :rows="4"
                                 maxlength="5000"
                             />
                         </div>
@@ -214,11 +215,13 @@
 <script>
 import { mapState } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
+import MarkdownEditor from '../components/MarkdownEditor.vue';
 
 export default {
     name: 'ReportSubmission',
     components: {
         ToastMessages,
+        MarkdownEditor,
     },
     data () {
         return {
@@ -340,6 +343,7 @@ export default {
             }, e);
 
             if (this.$http.isValid(data)) {
+                this.$refs.editor.clearDraft();
                 this.successInfo = this.category == 'aiBeatmap'
                     ? 'Your report has been submitted! You should not expect a response.'
                     : 'Your report has been submitted! Its outcome will be sent to you via osu! chat';

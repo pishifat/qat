@@ -85,12 +85,14 @@
 
             <b>Topic:</b>
 
-            <textarea
+            <markdown-editor
                 v-if="isEditingProposal"
+                ref="editor"
                 v-model="editProposalContent"
-                class="form-control form-control-sm w-75"
+                :storage-key="'md:discussion:' + selectedDiscussion.id"
+                input-class="form-control-sm w-75"
                 placeholder="enter to submit new proposal..."
-                rows="3"
+                :rows="3"
             />
 
             <span v-else class="small" v-html="$md.render(selectedDiscussion.shortReason)" />
@@ -197,9 +199,13 @@
 <script>
 import { mapState } from 'vuex';
 import discussionStoreMixin from '../../../mixins/discussionStore';
+import MarkdownEditor from '../../MarkdownEditor.vue';
 
 export default {
     name: 'DiscussionContext',
+    components: {
+        MarkdownEditor,
+    },
     mixins: [discussionStoreMixin],
     data() {
         return {
@@ -316,6 +322,7 @@ export default {
                 });
 
             if (this.$http.isValid(data)) {
+                if (this.$refs.editor) this.$refs.editor.clearDraft();
                 this.updateDiscussionInStore(data.discussion);
 
                 this.isEditingTitle = false;

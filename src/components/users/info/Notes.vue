@@ -61,11 +61,12 @@
 
                     <div v-if="note.id != editNoteId" class="text-secondary ms-2" v-html="$md.render(note.comment)" />
                     <div v-else>
-                        <textarea
+                        <markdown-editor
+                            ref="editEditor"
                             v-model="editNoteComment"
+                            :storage-key="'md:note-edit:' + note.id"
                             placeholder="edit user note..."
-                            class="form-control"
-                            rows="2"
+                            :rows="2"
                         />
 
                         <button class="btn btn-primary btn-sm w-100 mt-1" @click="editNote($event)">
@@ -75,11 +76,13 @@
                 </li>
             </ul>
 
-            <textarea
+            <markdown-editor
+                ref="editor"
                 v-model="comment"
+                class="mt-2"
+                :storage-key="'md:note:' + selectedUser.id"
                 placeholder="user note..."
-                class="form-control mt-2"
-                rows="2"
+                :rows="2"
             />
 
             <div class="row mt-1">
@@ -101,11 +104,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import UserLink from '../../UserLink.vue';
+import MarkdownEditor from '../../MarkdownEditor.vue';
 
 export default {
     name: 'Notes',
     components: {
         UserLink,
+        MarkdownEditor,
     },
     data() {
         return {
@@ -170,6 +175,9 @@ export default {
                 const data = await this.$http.executePost('/users/nat/saveNote/' + this.selectedUser.id, { comment: this.comment, isWarning }, e);
 
                 if (this.$http.isValid(data)) {
+                    this.$refs.editor.clearDraft();
+                    this.comment = '';
+
                     if (this.notes) {
                         this.notes.unshift(data.note);
                     }
@@ -181,6 +189,9 @@ export default {
                 const data = await this.$http.executePost('/users/nat/editNote/' + this.editNoteId, { comment: this.editNoteComment }, e);
 
                 if (this.$http.isValid(data)) {
+                    const editEditor = Array.isArray(this.$refs.editEditor) ? this.$refs.editEditor.find(Boolean) : this.$refs.editEditor;
+                    if (editEditor) editEditor.clearDraft();
+
                     if (this.notes) {
                         const i = this.notes.findIndex(n => n.id == this.editNoteId);
                         this.notes[i] = data.note;

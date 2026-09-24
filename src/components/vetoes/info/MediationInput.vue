@@ -7,14 +7,14 @@
 
         <div v-for="(reason, i) in selectedVeto.reasons" :key="i">
             <a :href="reason.link" target="_blank">{{ i+1 }}. {{ reason.summary }}</a>
-            <textarea
-                id="comment"
+            <markdown-editor
+                :ref="(el) => setEditor(i, el)"
                 v-model="input.comments[i]"
-                class="form-control mb-2"
+                class="mb-2"
+                :storage-key="selectedVeto.id + i.toString()"
                 placeholder="your thoughts (required)..."
-                rows="2"
+                :rows="2"
                 maxlength="500"
-                @change="updateLocalStorage(i, input.comments[i])"
             />
 
             <div class="d-flex justify-content-end mb-2">
@@ -55,9 +55,13 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import MarkdownEditor from '../../MarkdownEditor.vue';
 
 export default {
     name: 'MediationInput',
+    components: {
+        MarkdownEditor,
+    },
     data() {
         return {
             input: {
@@ -69,6 +73,7 @@ export default {
             mediation: {
                 mediationIds: [],
             },
+            editors: [],
         };
     },
     computed: {
@@ -95,16 +100,16 @@ export default {
                 this.vote.votes = [];
 
                 for (let i = 0; i < this.selectedVeto.reasons.length; i++) {
-                    for (const mediation of this.selectedVeto.mediations) {
-                        if (mediation.mediator && mediation.mediator.id === this.loggedInUser.id && mediation.reasonIndex == i) {
-                            this.input.comments[i] = mediation.comment;
-                            this.vote.votes[i] = mediation.vote;
-                            this.mediation.mediationIds[i] = mediation.id;
-                        } else {
-                            if (window.localStorage.getItem(this.selectedVeto.id + i.toString())) {
-                                this.input.comments[i] = window.localStorage.getItem(this.selectedVeto.id + i.toString());
-                            }
-                        }
+                    const mediation = (this.selectedVeto.mediations || []).find(item =>
+                        item.mediator && item.mediator.id === this.loggedInUser.id && item.reasonIndex == i
+                    );
+
+                    if (mediation) {
+                        this.input.comments[i] = mediation.comment;
+                        this.vote.votes[i] = mediation.vote;
+                        this.mediation.mediationIds[i] = mediation.id;
+                    } else {
+                        this.input.comments[i] = '';
                     }
                 }
             }
@@ -121,11 +126,12 @@ export default {
             );
 
             if (this.$http.isValid(data)) {
+                this.editors.forEach(editor => editor && editor.clearDraft());
                 this.$store.commit('vetoes/updateVeto', data.veto);
             }
         },
-        updateLocalStorage(index, text) {
-            window.localStorage.setItem(this.selectedVeto.id + index.toString(), text);
+        setEditor(index, editor) {
+            this.editors[index] = editor;
         },
     },
 };

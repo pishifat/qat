@@ -1,10 +1,11 @@
 <template>
     <section v-if="!room.isLocked && room.viewerCanPost" class="card card-body">
-        <textarea
+        <markdown-editor
+            ref="editor"
             v-model="messageInput"
-            class="form-control"
+            :storage-key="'md:chat:' + room.id"
             maxlength="5000"
-            rows="3"
+            :rows="3"
             :placeholder="room.viewerCanPost ? 'Type here...' : room.isLocked ? 'This chatroom is locked.' : 'You cannot post in this chatroom.'"
             :disabled="!room.viewerCanPost || isSubmitting"
         />
@@ -33,8 +34,13 @@
 </template>
 
 <script>
+import MarkdownEditor from '../MarkdownEditor.vue';
+
 export default {
     name: 'ChatroomComposer',
+    components: {
+        MarkdownEditor,
+    },
     props: {
         room: {
             type: Object,
@@ -56,6 +62,7 @@ export default {
             this.$emit('submit-message', this.messageInput, e);
         },
         clearMessage() {
+            this.$refs.editor.clearDraft();
             this.messageInput = '';
         },
     },

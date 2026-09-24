@@ -7,14 +7,13 @@
                 </div>
 
                 <small>Summarize your contributions to osu! and the NAT since your last evaluation (or the last 2 months). This will appear as a "note" on your user card.</small>
-                <div class="form-group">
-                    <textarea
-                        v-model="selfSummaryText"
-                        class="form-control"
-                        rows="4"
-                        maxlength="5000"
-                    />
-                </div>
+                <markdown-editor
+                    ref="editor"
+                    v-model="selfSummaryText"
+                    :storage-key="'md:self-summary:' + selectedEvaluation.user.id"
+                    :rows="4"
+                    maxlength="5000"
+                />
             </div>
         </div>
 
@@ -28,9 +27,13 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import MarkdownEditor from '../../../MarkdownEditor.vue';
 
 export default {
     name: 'NatSelfEvaluation',
+    components: {
+        MarkdownEditor,
+    },
     data() {
         return {
             selfSummaryText: '',
@@ -79,6 +82,8 @@ export default {
             const result = await this.$http.executePost('/users/nat/saveNote/' + this.selectedEvaluation.user.id, { noteId: this.noteId, evaluationId: this.selectedEvaluation.id, comment: this.selfSummaryText, isSummary: true }, e);
 
             if (result && !result.error) {
+                this.$refs.editor.clearDraft();
+
                 if (result.evaluation) {
                     this.$store.commit('evaluations/updateEvaluation', result.evaluation);
                 }

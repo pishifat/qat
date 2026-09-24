@@ -290,6 +290,31 @@ img {
     border-top: 1px solid $line-break;
 }
 
+.v-html-content table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0.75rem 0;
+    border: 1px solid rgba(124, 151, 165, 0.35);
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+
+.v-html-content th,
+.v-html-content td {
+    padding: 5px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(211, 211, 211, 0.15);
+}
+
+.v-html-content th {
+    background-color: $bright-blue-gray;
+    border-bottom: 2px solid rgba(124, 151, 165, 0.2);
+}
+
+.v-html-content tbody tr:last-child td {
+    border-bottom: none;
+}
+
 /* Code blocks */
 pre {
     background-color: $body-bg;

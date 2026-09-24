@@ -7,31 +7,15 @@
             <div class="col-sm-12">
                 <p>
                     <b>{{ isNatEvalLeaderInput ? 'NAT activity comments:' : 'Evaluation:' }}</b>
-                    <a
-                        :class="'ms-1 ' + (previewModdingComment ? 'text-success' : '')"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        title="toggle comment preview"
-                        href="#"
-                        @click.prevent="togglePreviewModdingComment()"
-                    >
-                        <i class="fas fa-search" />
-                    </a>
                 </p>
 
-                <div class="form-group">
-                    <div
-                        v-if="previewModdingComment"
-                        class="small mb-2 card card-body v-html-content"
-                        v-html="$md.render(moddingComment)"
-                    />
-                    <textarea
-                        v-model="moddingComment"
-                        class="form-control"
-                        rows="4"
-                        maxlength="5000"
-                    />
-                </div>
+                <markdown-editor
+                    ref="editor"
+                    v-model="moddingComment"
+                    :storage-key="selectedEvaluation.id + 'mod'"
+                    :rows="4"
+                    maxlength="5000"
+                />
             </div>
         </div>
 
@@ -80,9 +64,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import { isNatEvaluation } from 'shared/isNatEvaluation';
+import MarkdownEditor from '../../../MarkdownEditor.vue';
 
 export default {
     name: 'EvaluationInput',
+    components: {
+        MarkdownEditor,
+    },
     data() {
         return {
             moddingComment: '',
@@ -93,9 +81,6 @@ export default {
     computed: {
         ...mapState([
             'loggedInUser',
-        ]),
-        ...mapState('evaluations', [
-            'previewModdingComment',
         ]),
         ...mapGetters('evaluations', [
             'selectedEvaluation',
@@ -108,25 +93,11 @@ export default {
         selectedEvaluation() {
             this.findUserReview();
         },
-        moddingComment() {
-            this.updateLocalStorage('mod', this.moddingComment);
-        },
     },
     mounted() {
         this.findUserReview();
     },
     methods: {
-        togglePreviewModdingComment() {
-            this.$store.commit('evaluations/togglePreviewModdingComment');
-        },
-        updateLocalStorage(type, text) {
-            window.localStorage.setItem(this.selectedEvaluation.id + type, text);
-        },
-        removeLocalStorage() {
-            if (window.localStorage.getItem(this.selectedEvaluation.id + 'mod')) {
-                window.localStorage.removeItem(this.selectedEvaluation.id + 'mod');
-            }
-        },
         findUserReview() {
             this.moddingComment = '';
             this.vote = 0;
@@ -144,10 +115,6 @@ export default {
                 this.evaluationId = mockReview.id || null;
                 this.moddingComment = mockReview.moddingComment || '';
                 this.vote = mockReview.vote || 0;
-            } else {
-                if (window.localStorage.getItem(this.selectedEvaluation.id + 'mod')) {
-                    this.moddingComment = window.localStorage.getItem(this.selectedEvaluation.id + 'mod');
-                }
             }
         },
         async submitEval (e) {
@@ -164,7 +131,7 @@ export default {
                     }, e);
 
                 if (result && !result.error) {
-                    this.removeLocalStorage();
+                    this.$refs.editor.clearDraft();
                     this.$store.commit('evaluations/updateEvaluation', result);
                     this.$store.dispatch('updateToastMessages', {
                         message: `Submitted evaluation`,

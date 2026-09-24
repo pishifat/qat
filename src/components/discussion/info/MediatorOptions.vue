@@ -24,12 +24,12 @@
             <hr>
 
             <!-- comment -->
-            <textarea
-                id="comment"
+            <markdown-editor
+                ref="editor"
                 v-model="comment"
-                class="form-control"
+                :storage-key="'md:discussion-vote:' + selectedDiscussion.id"
                 :placeholder="commentRequired ? 'your thoughts... (required)' : 'your thoughts... (optional)'"
-                rows="2"
+                :rows="2"
             />
 
             <!-- vote -->
@@ -87,11 +87,15 @@
 <script>
 import { mapState } from 'vuex';
 import discussionStoreMixin from '../../../mixins/discussionStore';
+import MarkdownEditor from '../../MarkdownEditor.vue';
 import enums from 'shared/enums';
 const { VisualContentConsiderations } = enums;
 
 export default {
     name: 'MediatorOptions',
+    components: {
+        MarkdownEditor,
+    },
     mixins: [discussionStoreMixin],
     props: {
         isContentReview: {
@@ -159,6 +163,7 @@ export default {
                 }, e);
 
             if (this.$http.isValid(data)) {
+                this.$refs.editor.clearDraft();
                 this.updateDiscussionInStore(data.discussion);
             }
         },

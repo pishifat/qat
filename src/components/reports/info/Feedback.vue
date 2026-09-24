@@ -11,11 +11,12 @@
                     : 'This will be sent to the reporter in an osu! message. Include the consensus and any actions being taken.' }}
             </p>
 
-            <textarea
-                id="feedback"
+            <markdown-editor
+                ref="editor"
                 v-model="feedback"
-                class="form-control mb-2"
-                rows="4"
+                class="mb-2"
+                :storage-key="'md:report-feedback:' + selectedReport.id"
+                :rows="4"
             />
 
             <div class="d-flex flex-wrap align-items-center justify-content-end">
@@ -92,9 +93,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import MarkdownEditor from '../../MarkdownEditor.vue';
 
 export default {
     name: 'Feedback',
+    components: {
+        MarkdownEditor,
+    },
     data() {
         return {
             feedback: '',
@@ -145,6 +150,7 @@ export default {
                 );
 
                 if (this.$http.isValid(data)) {
+                    this.$refs.editor.clearDraft();
                     this.$store.dispatch('manageReports/updateReport', data.report);
                 }
             }

@@ -50,11 +50,12 @@
             <p class="mt-2 mb-1">
                 Shorten the "reason" field:
             </p>
-            <textarea
+            <markdown-editor
+                ref="editor"
                 v-model="newEventContent"
-                class="form-control form-control-sm me-2"
-                type="text"
-                rows="4"
+                :storage-key="'md:nomination-reset:' + event._id"
+                input-class="form-control-sm me-2"
+                :rows="4"
                 maxlength="1000"
             />
             <button class="btn btn-sm btn-primary w-100 mb-2" @click="updateContent($event);">
@@ -84,12 +85,14 @@
 import { mapState } from 'vuex';
 import Impact from '../Impact.vue';
 import ObviousnessSeverity from '../ObviousnessSeverity.vue';
+import MarkdownEditor from '../../../../MarkdownEditor.vue';
 
 export default {
     name: 'NominationResetEditing',
     components: {
         Impact,
         ObviousnessSeverity,
+        MarkdownEditor,
     },
     props: {
         event: {
@@ -177,6 +180,7 @@ export default {
             const data = await this.$http.executePost('/dataCollection/updateContent/' + this.event._id, { reason: this.newEventContent }, e);
 
             if (this.$http.isValid(data)) {
+                this.$refs.editor.clearDraft();
                 this.$store.commit('activity/updateEvent', {
                     id: this.event._id,
                     type: this.event.type,

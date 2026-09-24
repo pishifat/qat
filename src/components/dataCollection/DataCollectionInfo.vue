@@ -16,11 +16,12 @@
                 </a>
             </p>
 
-            <textarea
+            <markdown-editor
+                ref="editor"
                 v-model="newEventContent"
-                class="form-control form-control-sm me-2"
-                type="text"
-                rows="4"
+                :storage-key="selectedEvent ? 'md:data-collection:' + selectedEvent.id : ''"
+                input-class="form-control-sm me-2"
+                :rows="4"
                 maxlength="1000"
             />
 
@@ -50,6 +51,7 @@ import { mapGetters } from 'vuex';
 import Impact from '../evaluations/info/currentBns/Impact.vue';
 import ObviousnessSeverity from '../evaluations/info/currentBns/ObviousnessSeverity.vue';
 import ModalDialog from '../ModalDialog.vue';
+import MarkdownEditor from '../MarkdownEditor.vue';
 
 export default {
     name: 'DataCollectionInfo',
@@ -57,6 +59,7 @@ export default {
         Impact,
         ObviousnessSeverity,
         ModalDialog,
+        MarkdownEditor,
     },
     data() {
         return {
@@ -84,6 +87,7 @@ export default {
             const data = await this.$http.executePost('/dataCollection/updateContent/' + this.selectedEvent.id, { reason: this.newEventContent }, e);
 
             if (this.$http.isValid(data)) {
+                this.$refs.editor.clearDraft();
                 this.$store.commit('dataCollection/updateEvent', {
                     id: this.selectedEvent.id,
                     type: this.selectedEvent.type,

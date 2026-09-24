@@ -58,11 +58,13 @@
                     </a>
                 </div>
                 <div v-if="isEditing">
-                    <textarea
+                    <markdown-editor
+                        ref="editor"
                         v-model="requestInfo"
-                        class="form-control form-control-sm my-2"
-                        type="text"
-                        rows="4"
+                        class="my-2"
+                        :storage-key="'md:request-info:' + selectedUser.id"
+                        input-class="form-control-sm"
+                        :rows="4"
                         placeholder="BN requests info (markdown is supported!)"
                     />
 
@@ -100,6 +102,7 @@ import ModalDialog from '../ModalDialog.vue';
 import Preferences from './info/Preferences.vue';
 import evaluations from '../../mixins/evaluations';
 import DebugViewDocument from '../DebugViewDocument.vue';
+import MarkdownEditor from '../MarkdownEditor.vue';
 
 export default {
     name: 'UserInfo',
@@ -108,6 +111,7 @@ export default {
         ModalDialog,
         Preferences,
         DebugViewDocument,
+        MarkdownEditor,
     },
     mixins: [ evaluations ],
     data () {
@@ -141,6 +145,7 @@ export default {
             const res = await this.$http.executePost(`/users/${this.selectedUser.id}/updateRequestInfo`, { requestInfo: this.requestInfo }, e);
 
             if (this.$http.isValid(res)) {
+                this.$refs.editor.clearDraft();
                 let user = this.selectedUser;
                 user.requestInfo = res.user.requestInfo;
                 this.$store.commit('usersHome/updateUser', user);

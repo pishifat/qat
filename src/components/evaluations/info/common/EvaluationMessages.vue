@@ -26,10 +26,10 @@
             "
         >
             <div v-if="replies" class="card card-body">
-                <textarea
-                    id="messageInput"
+                <markdown-editor
+                    ref="editor"
                     v-model="messageInput"
-                    class="form-control"
+                    :storage-key="'md:eval-message:' + evaluation.id"
                     maxlength="1000"
                     :placeholder="
                         evaluation.messagesLocked
@@ -38,7 +38,7 @@
                                 ? 'type a reply...'
                                 : 'type a question about your evaluation...'
                     "
-                    rows="2"
+                    :rows="2"
                     :disabled="evaluation.messagesLocked"
                 />
                 <b v-if="messageInput && messageInput.length > 900" :class="messageInput.length == 1000 ? 'text-danger' : messageInput.length > 900 ? 'text-warning' : 'text-secondary'">{{ messageInput.length }}</b>
@@ -68,9 +68,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import MarkdownEditor from '../../../MarkdownEditor.vue';
 
 export default {
     name: 'EvaluationMessages',
+    components: {
+        MarkdownEditor,
+    },
     props: {
         evaluation: {
             type: Object,
@@ -104,6 +108,7 @@ export default {
 
             if (this.$http.isValid(messages)) {
                 this.$store.commit('message/updateEvaluationMessages', messages);
+                this.$refs.editor.clearDraft();
                 this.messageInput = '';
                 this.$store.dispatch('updateToastMessages', {
                     message: 'Message sent',

@@ -12,12 +12,13 @@
                 </div>
                 <div>
                     Content:
-                    <span class="small text-secondary">(It's recommended to use an external markdown editor for larger edits.)</span>
-                    <textarea
+                    <markdown-editor
+                        ref="editor"
                         v-model="article.content"
-                        class="form-control form-control-sm"
-                        type="text"
+                        :storage-key="'md:docs:' + $route.params.slug"
+                        input-class="form-control-sm"
                         :rows="Math.min(article.content.split('\n').length + 1, 20)"
+                        :render-env="{ skipImageProxy: true }"
                     />
                 </div>
                 <span class="small text-secondary my-1">
@@ -62,11 +63,13 @@
 <script>
 import { mapState } from 'vuex';
 import ToastMessages from '../components/ToastMessages.vue';
+import MarkdownEditor from '../components/MarkdownEditor.vue';
 
 export default {
     name: 'DocumentationPage',
     components: {
         ToastMessages,
+        MarkdownEditor,
     },
     data() {
         return {
@@ -114,6 +117,7 @@ export default {
             }, e);
 
             if (this.$http.isValid(res)) {
+                this.$refs.editor.clearDraft();
                 this.originalArticle = JSON.parse(JSON.stringify(this.article));
                 this.isEditing = false;
                 this.$router.push(`/docs/${res.slug}`);
@@ -158,7 +162,6 @@ export default {
 
 /* tables */
 :deep(table) {
-    border-collapse: collapse;
     margin: 2rem 0;
 }
 :deep(thead tr) {
