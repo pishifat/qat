@@ -12,7 +12,11 @@
                 v-if="events.length"
                 :headers="['Date', 'Mapset', 'Host']"
             >
-                <tr v-for="event in events" :key="event.id">
+                <tr
+                    v-for="event in events"
+                    :key="event.id"
+                    :class="{ 'events-list-reviewed': canMarkReviewed && event.isReviewed }"
+                >
                     <td class="text-nowrap">
                         {{ toMonthDayYear(timestamp(event)) }}
                     </td>
@@ -81,15 +85,20 @@
                             </span>
                         </span>
                         <a
-                            v-if="loggedInUser && (loggedInUser.isNat || loggedInUser.isTrialNat) && isEvaluation"
+                            v-if="canMarkReviewed"
                             href="#"
-                            :class="processing ? 'processing' : ''"
                             data-bs-toggle="tooltip"
                             data-bs-placement="right"
                             title="mark map as reviewed"
                             @click.prevent="toggleIsReviewed(event)"
                         >
+                            <span
+                                v-if="processingId == event._id"
+                                class="spinner-border spinner-border-sm review-spinner"
+                                role="status"
+                            />
                             <font-awesome-icon
+                                v-else
                                 icon="fa-solid fa-circle-check"
                                 :class="
                                     event.isReviewed
@@ -153,7 +162,7 @@ export default {
     },
     data() {
         return {
-            processing: false,
+            processingId: null,
             discussionCountKeys: ['suggestion', 'problem', 'mapper_note', 'praise', 'hype', 'review'],
             discussionCountLabels: {
                 suggestion: 'Suggestion',
@@ -176,26 +185,29 @@ export default {
     computed: {
         ...mapState('activity', ['isLoading']),
         ...mapState(['loggedInUser']),
+        canMarkReviewed() {
+            return this.loggedInUser && (this.loggedInUser.isNat || this.loggedInUser.isTrialNat) && this.isEvaluation;
+        },
     },
     methods: {
         async toggleIsReviewed(event) {
-            if (!this.processing) {
-                this.processing = true;
-                const data = await this.$http.executePost(
-                    '/dataCollection/toggleIsReviewed/' + event._id,
-                    {}
-                );
+            if (this.processingId) return;
 
-                if (this.$http.isValid(data)) {
-                    this.$store.commit('activity/updateEvent', {
-                        id: event._id,
-                        type: event.type,
-                        modifiedField: 'isReviewed',
-                        value: data.isReviewed,
-                    });
-                }
-                this.processing = false;
+            this.processingId = event._id;
+            const data = await this.$http.executePost(
+                '/dataCollection/toggleIsReviewed/' + event._id,
+                {}
+            );
+
+            if (this.$http.isValid(data)) {
+                this.$store.commit('activity/updateEvent', {
+                    id: event._id,
+                    type: event.type,
+                    modifiedField: 'isReviewed',
+                    value: data.isReviewed,
+                });
             }
+            this.processingId = null;
         },
         beatmapsetId(event) {
             if (this.eventsId == 'qualityAssuranceChecks') {
@@ -293,8 +305,14 @@ export default {
 </script>
 
 <style>
-.processing {
-    pointer-events: none;
+.events-list-reviewed {
+    --bs-table-bg: color-mix(in srgb, var(--bs-success) 16%, #212529);
+}
+
+.review-spinner {
+    width: 0.9rem;
+    height: 0.9rem;
+    vertical-align: -0.125em;
 }
 
 .discussion-counts {
