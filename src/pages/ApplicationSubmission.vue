@@ -95,11 +95,11 @@
         </div>
 
         <!-- instant rejoin -->
-        <template v-if="relevantResignation && relevantResignation.consensus === 'resignedOnGoodTerms' && !cooldowns.length && !loggedInUser.isBannedFromBn">
+        <template v-if="isGoodTermsResignation && !cooldowns.length && !loggedInUser.isBannedFromBn">
             <div class="card card-body">
                 <h4>Bypass application</h4>
                 <p class="mt-2">
-                    This option is available until {{ $moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ formatMode(relevantResignation.mode) }} Beatmap Nominators.
+                    This option is available until {{ $moment(relevantResignation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }} because you recently resigned from the {{ formatMode(relevantResignation.mode) }} {{ relevantResignation.consensus === 'removeFromNat' ? 'Nomination Assessment Team' : 'Beatmap Nominators' }}.
                 </p>
                 <p class="mt-2">
                     The NAT will review for any potential concerns and re-admit you to the Beatmap Nominators if everything is okay!
@@ -425,6 +425,9 @@ export default {
         ]),
         wasBn() {
             return this.loggedInUser.history && this.loggedInUser.history.length;
+        },
+        isGoodTermsResignation() {
+            return this.relevantResignation && (this.relevantResignation.consensus === 'resignedOnGoodTerms' || this.relevantResignation.natResignedOnGoodTerms);
         },
     },
     watch: {

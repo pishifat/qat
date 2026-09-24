@@ -610,6 +610,12 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
                 evaluation.feedback = 'None';
                 evaluation.isReviewed = true;
             }
+
+            evaluation.natResignedOnGoodTerms = userGroup == 'user' && !!req.body.resignedOnGoodTerms;
+
+            if (evaluation.natResignedOnGoodTerms) {
+                evaluation.cooldownDate = new Date();
+            }
         }
 
         // bn evaluation processing

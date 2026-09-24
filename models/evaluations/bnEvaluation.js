@@ -8,6 +8,7 @@ const bnEvaluationSchema = new mongoose.Schema({
     addition: { type: String, enum: ['lowActivityWarning', 'behaviorWarning', 'mapQualityWarning', 'moddingQualityWarning', 'none'] },
     activityToCheck: { type: Number },
     selfSummary: { type: 'ObjectId', ref: 'Note' }, // only used for NAT evals
+    natResignedOnGoodTerms: { type: Boolean, default: false }, // NAT removal only; unlocks the 1-year BN re-join bypass
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true }, discriminatorKey: 'kind' });
 
 bnEvaluationSchema.virtual('isBnEvaluation').get(function () {

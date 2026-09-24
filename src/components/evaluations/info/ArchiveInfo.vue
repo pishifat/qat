@@ -40,6 +40,10 @@
 
             <consensus />
 
+            <p v-if="isNatEval && selectedEvaluation.natResignedOnGoodTerms">
+                <b>Good terms resignation:</b> BN re-join bypass until {{ $moment(selectedEvaluation.archivedAt).add(1, 'years').format('YYYY-MM-DD') }}
+            </p>
+
             <div v-if="selectedEvaluation.isApplication && selectedEvaluation.consensus == 'pass' && selectedEvaluation.natBuddy">
                 <p>
                     <b>NAT Buddy:</b>

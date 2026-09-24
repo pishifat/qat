@@ -22,12 +22,24 @@ router.get('/relevantInfo', async (req, res) => {
 
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
-    let [resignations, activeApps, cooldownApps, cooldownEvals, cooldownResignations, totalActiveApplications] = await Promise.all([
+    let [resignations, natGoodTerms, activeApps, cooldownApps, cooldownEvals, cooldownResignations, totalActiveApplications] = await Promise.all([
         ResignationEvaluation
             .find({
                 user: req.session.mongoId,
                 active: false,
                 consensus: { $exists: true },
+                archivedAt: { $gt: oneYearAgo },
+                cooldownDate: { $lt: new Date() },
+            })
+            .sort({
+                createdAt: -1,
+            }),
+        BnEvaluation
+            .find({
+                user: req.session.mongoId,
+                active: false,
+                consensus: 'removeFromNat',
+                natResignedOnGoodTerms: true,
                 archivedAt: { $gt: oneYearAgo },
                 cooldownDate: { $lt: new Date() },
             })
@@ -68,6 +80,8 @@ router.get('/relevantInfo', async (req, res) => {
 
         return app;
     });
+
+    resignations = resignations.concat(natGoodTerms).sort((a, b) => new Date(b.archivedAt) - new Date(a.archivedAt));
 
     res.json({
         resignations,
@@ -351,7 +365,7 @@ router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
 
     const oneYearAgo = moment().subtract(1, 'years').toDate();
 
-    const [cooldownApp, cooldownEval, lastResignation] = await Promise.all([
+    const [cooldownApp, cooldownEval, lastResignation, natGoodTerms] = await Promise.all([
         AppEvaluation.findOne({
             user: req.session.mongoId,
             mode,
@@ -378,10 +392,19 @@ router.post('/rejoinApply', middlewares.isLoggedIn, async (req, res) => {
             .sort({
                 createdAt: -1,
             }),
+        BnEvaluation.findOne({
+            user: req.session.mongoId,
+            active: false,
+            mode,
+            consensus: 'removeFromNat',
+            natResignedOnGoodTerms: true,
+            archivedAt: { $gt: oneYearAgo },
+            cooldownDate: { $lt: new Date() },
+        }),
     ]);
 
     // security for people who try to circumvent front-end
-    if (cooldownApp || cooldownEval || !lastResignation) {
+    if (cooldownApp || cooldownEval || (!lastResignation && !natGoodTerms)) {
         return res.json({
             error: `You are not eligible to re-join right now.`,
         });

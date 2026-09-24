@@ -15,6 +15,18 @@
             <reviews-listing class="col-sm-12 mb-4" />
             <evaluation-input class="col-sm-12 mb-4" />
         </div>
+        <div class="form-check mb-3">
+            <input
+                id="goodTermsResignation"
+                v-model="resignedOnGoodTerms"
+                class="form-check-input"
+                type="checkbox"
+            >
+            <label class="form-check-label" for="goodTermsResignation">Good terms resignation</label>
+            <div class="text-secondary small">
+                Only applies when removing from NAT. They can use the BN re-join bypass for 1 year.
+            </div>
+        </div>
         <div class="row">
             <div class="col-sm-4">
                 <button
@@ -57,6 +69,11 @@ export default {
         EvaluationInput,
         ReviewsListing,
     },
+    data () {
+        return {
+            resignedOnGoodTerms: false,
+        };
+    },
     computed: {
         ...mapState([
             'loggedInUser',
@@ -80,7 +97,11 @@ export default {
 
             if (!confirm(confirmText)) return;
 
-            const result = await this.$http.executePost(`/bnEval/setComplete/`, { evalIds: [this.selectedEvaluation.id], userGroup }, e);
+            const result = await this.$http.executePost(`/bnEval/setComplete/`, {
+                evalIds: [this.selectedEvaluation.id],
+                userGroup,
+                resignedOnGoodTerms: userGroup === 'user' && this.resignedOnGoodTerms,
+            }, e);
 
             if (result && !result.error) {
                 this.$store.commit('evaluations/setEvaluations', result);
