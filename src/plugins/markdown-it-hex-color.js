@@ -34,7 +34,12 @@ export default function markdownItHexColor(md) {
             const token = state.push('span_open', 'span', 1);
             token.attrSet('style', 'color:#' + hex);
 
-            state.md.inline.parse(content, state.md, state.env, state.tokens);
+            const nested = [];
+            state.md.inline.parse(content, state.md, state.env, nested);
+
+            for (const nestedToken of nested) {
+                state.tokens.push(nestedToken);
+            }
 
             state.push('span_close', 'span', -1);
         }
