@@ -30,6 +30,8 @@
                     </div>
                 </div>
 
+                <cooldown v-if="showCooldown" class="mt-2" />
+
                 <hr v-if="selectedEvaluation.consensus">
                 <feedback-info v-if="selectedEvaluation.consensus" />
             </div>
@@ -54,6 +56,7 @@
 import { mapState, mapGetters } from 'vuex';
 import { isNatEvaluation } from 'shared/isNatEvaluation';
 import Consensus from './common/Consensus.vue';
+import Cooldown from './common/Cooldown.vue';
 import ReviewsListing from './common/ReviewsListing.vue';
 import FeedbackInfo from './common/FeedbackInfo.vue';
 import evaluations from '../../../mixins/evaluations.js';
@@ -66,6 +69,7 @@ export default {
     name: 'DiscussionInfo',
     components: {
         Consensus,
+        Cooldown,
         ReviewsListing,
         FeedbackInfo,
         EvaluationIsReviewed,
@@ -82,6 +86,9 @@ export default {
         },
         isNatEval () {
             return isNatEvaluation(this.selectedEvaluation);
+        },
+        showCooldown () {
+            return this.negativeConsensus || this.consensus === 'resignedOnStandardTerms';
         },
     },
 };

@@ -824,13 +824,6 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
         .orFail();
 
     evaluation.addition = req.body.addition;
-
-    if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn) {
-        const date = new Date();
-        date.setDate(date.getDate() + 60);
-        evaluation.cooldownDate = date;
-    }
-
     await evaluation.save();
 
     res.json(evaluation);
@@ -849,6 +842,43 @@ router.post('/setAddition/:id', middlewares.isNatOrTrialNat, async (req, res) =>
             author: discord.defaultWebhookAuthor(req.session),
             color: discord.webhookColors.lightBlue,
             description: `[**${evaluation.user.username}**'s current BN eval](http://bn.mappersguild.com/bneval?id=${evaluation.id}) addition set to **${additionText}**`,
+        }],
+        evaluation.mode
+    );
+});
+
+/* POST set cooldown date */
+router.post('/setCooldownDate/:id', middlewares.isNatOrTrialNat, async (req, res) => {
+    const cooldownDate = new Date(req.body.cooldownDate);
+
+    if (Number.isNaN(cooldownDate.getTime())) {
+        return res.json({ error: 'Invalid cooldown date' });
+    }
+
+    const evaluation = await Evaluation
+        .findById(req.params.id)
+        .populate(defaultPopulate)
+        .orFail();
+
+    evaluation.cooldownDate = cooldownDate;
+    await evaluation.save();
+
+    const cooldownDays = Math.max(0, moment(cooldownDate).startOf('day').diff(moment().startOf('day'), 'days'));
+    const cooldownLabel = `${cooldownDays} day${cooldownDays === 1 ? '' : 's'} from today`;
+
+    res.json(evaluation);
+
+    Logger.generate(
+        req.session.mongoId,
+        `Changed cooldown date to ${cooldownDate.toISOString().slice(0, 10)} (${cooldownLabel}) for ${evaluation.user.username}'s ${evaluation.mode} ${evaluation.isResignation ? 'resignation' : 'BN eval'}`,
+        'bnEvaluation',
+        evaluation._id
+    );
+    discord.webhookPost(
+        [{
+            author: discord.defaultWebhookAuthor(req.session),
+            color: discord.webhookColors.darkBlue,
+            description: `Re-application date set to **${cooldownDate.toISOString().slice(0, 10)}** (${cooldownLabel}) for [**${evaluation.user.username}**'s ${evaluation.isResignation ? 'resignation' : 'current BN eval'}](http://bn.mappersguild.com/bneval?id=${evaluation.id})`,
         }],
         evaluation.mode
     );
