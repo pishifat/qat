@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="impact === 0 || impact === 1 || impact === 2">
         <p class="small">
             <b>Impact level (legacy):</b>
             <span :class="getImpact(impact).color">
