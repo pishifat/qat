@@ -120,7 +120,7 @@ export default {
         },
         maxHeight: {
             type: [Number, String],
-            default: 240,
+            default: 360,
         },
         maxlength: {
             type: [Number, String],
@@ -461,7 +461,7 @@ export default {
 .markdown-editor-body textarea.is-growing {
     field-sizing: content;
     overflow-y: auto;
-    resize: none;
+    resize: vertical;
     min-height: calc(var(--editor-rows) * 1lh + 0.75rem);
     max-height: var(--editor-max-height);
 }
