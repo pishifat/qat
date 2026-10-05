@@ -70,6 +70,11 @@ function getTypeFilter(isContentReview) {
         : { isContentReview: { $ne: true } };
 }
 
+/** NAT-only discussion votes are visible to NAT. Content reviews keep the full-read gate. */
+function canViewNatOnly(isContentReview, hasFullReadAccess, isNat) {
+    return isContentReview ? !!hasFullReadAccess : !!isNat;
+}
+
 function buildListFilters(opts = {}) {
     const conditions = [];
     if (opts.mode && opts.mode.trim()) {
@@ -150,7 +155,7 @@ function discussionDetailPath(d) {
     return d.isContentReview ? `/contentreview/${id}` : `/discussionvote/${id}`;
 }
 
-async function fetchActiveDiscussionsMinimal(isContentReview, hasFullReadAccess, mongoId, listFilters = {}) {
+async function fetchActiveDiscussionsMinimal(isContentReview, hasFullReadAccess, mongoId, listFilters = {}, isNat = false) {
     const filter = {
         isHidden: { $ne: true },
         isActive: true,
@@ -158,7 +163,7 @@ async function fetchActiveDiscussionsMinimal(isContentReview, hasFullReadAccess,
         ...buildListFilters(listFilters),
     };
 
-    if (!hasFullReadAccess) {
+    if (!canViewNatOnly(isContentReview, hasFullReadAccess, isNat)) {
         filter.isNatOnly = { $ne: true };
     }
 
@@ -177,7 +182,7 @@ async function fetchActiveDiscussionsMinimal(isContentReview, hasFullReadAccess,
     ));
 }
 
-async function fetchArchivedDiscussionsMinimal(isContentReview, page, limit, mongoId, hasFullReadAccess, listFilters = {}) {
+async function fetchArchivedDiscussionsMinimal(isContentReview, page, limit, mongoId, hasFullReadAccess, listFilters = {}, isNat = false) {
     const filter = {
         isHidden: { $ne: true },
         isActive: false,
@@ -185,7 +190,7 @@ async function fetchArchivedDiscussionsMinimal(isContentReview, page, limit, mon
         ...buildListFilters(listFilters),
     };
 
-    if (!hasFullReadAccess) {
+    if (!canViewNatOnly(isContentReview, hasFullReadAccess, isNat)) {
         filter.isNatOnly = { $ne: true };
     }
 
@@ -205,7 +210,7 @@ async function fetchArchivedDiscussionsMinimal(isContentReview, page, limit, mon
     ));
 }
 
-async function countArchivedDiscussions(isContentReview, hasFullReadAccess, listFilters = {}) {
+async function countArchivedDiscussions(isContentReview, hasFullReadAccess, listFilters = {}, isNat = false) {
     const filter = {
         isHidden: { $ne: true },
         isActive: false,
@@ -213,7 +218,7 @@ async function countArchivedDiscussions(isContentReview, hasFullReadAccess, list
         ...buildListFilters(listFilters),
     };
 
-    if (!hasFullReadAccess) {
+    if (!canViewNatOnly(isContentReview, hasFullReadAccess, isNat)) {
         filter.isNatOnly = { $ne: true };
     }
 
@@ -228,8 +233,8 @@ async function getDiscussionById(id, isContentReview, mongoId, hasFullReadAccess
 
     if (!doc) return null;
 
-    if (!hasFullReadAccess) {
-        if (doc.isNatOnly) return null;
+    if (doc.isNatOnly && !canViewNatOnly(isContentReview, hasFullReadAccess, isNat)) {
+        return null;
     }
 
     let discussion;

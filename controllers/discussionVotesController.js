@@ -6,6 +6,7 @@ const discussionsService = require('../services/discussionsService');
  */
 async function getList(req, res) {
     const hasFullReadAccess = !!res.locals.userRequest.hasFullReadAccess;
+    const isNat = !!res.locals.userRequest.isNat;
     const archivedPage = Math.max(1, parseInt(req.query.archivedPage) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 21));
     const mongoId = req.session.mongoId;
@@ -16,9 +17,9 @@ async function getList(req, res) {
     };
 
     const [active, archivedDiscussions, totalCount] = await Promise.all([
-        discussionsService.fetchActiveDiscussionsMinimal(false, hasFullReadAccess, mongoId, listFilters),
-        discussionsService.fetchArchivedDiscussionsMinimal(false, archivedPage, limit, mongoId, hasFullReadAccess, listFilters),
-        discussionsService.countArchivedDiscussions(false, hasFullReadAccess, listFilters),
+        discussionsService.fetchActiveDiscussionsMinimal(false, hasFullReadAccess, mongoId, listFilters, isNat),
+        discussionsService.fetchArchivedDiscussionsMinimal(false, archivedPage, limit, mongoId, hasFullReadAccess, listFilters, isNat),
+        discussionsService.countArchivedDiscussions(false, hasFullReadAccess, listFilters, isNat),
     ]);
 
     const totalPages = Math.max(1, Math.ceil(totalCount / limit));
