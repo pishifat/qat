@@ -1,37 +1,60 @@
 <template>
     <div class="card card-body">
-        <select
-            v-if="loggedInUser.isNat"
-            id="mode"
-            v-model="category"
-            class="form-select mb-4"
-            @change="loadCategory($event)"
-        >
-            <option value="all">
-                All
-            </option>
-            <option disabled>
-                ---
-            </option>
-            <option v-for="log in logCategories" :key="log" :value="log">
-                {{ log }}
-            </option>
-            <option value="error">
-                error
-            </option>
-        </select>
+        <div class="d-flex flex-wrap align-items-center mb-4">
+            <select
+                v-if="loggedInUser.isNat"
+                id="mode"
+                v-model="category"
+                class="form-select w-auto"
+                @change="loadCategory($event)"
+            >
+                <option value="all">
+                    All
+                </option>
+                <option disabled>
+                    ---
+                </option>
+                <option v-for="log in logCategories" :key="log" :value="log">
+                    {{ log }}
+                </option>
+                <option value="error">
+                    error
+                </option>
+            </select>
 
-        <select
-            v-else
-            id="mode"
-            v-model="publicCategory"
-            class="form-select mb-4"
-            @change="loadCategory($event)"
-        >
-            <option v-for="log in publicCategories" :key="log" :value="log">
-                {{ log }}
-            </option>
-        </select>
+            <select
+                v-else
+                id="mode"
+                v-model="publicCategory"
+                class="form-select w-auto"
+                @change="loadCategory($event)"
+            >
+                <option v-for="log in publicCategories" :key="log" :value="log">
+                    {{ log }}
+                </option>
+            </select>
+
+            <input
+                v-model="userQuery"
+                type="text"
+                placeholder="username or osuID..."
+                maxlength="18"
+                autocomplete="off"
+                class="form-control w-auto ms-1"
+                @keyup.enter="loadCategory($event)"
+            >
+            <input
+                v-model="actionQuery"
+                type="text"
+                placeholder="action..."
+                autocomplete="off"
+                class="form-control w-auto ms-1"
+                @keyup.enter="loadCategory($event)"
+            >
+            <button class="btn btn-sm btn-primary ms-2" type="button" @click="loadCategory($event)">
+                Search
+            </button>
+        </div>
 
         <data-table
             :headers="category == 'error' ? ['date', 'user', 'action', 'stack', 'extra'] : category == 'all' ? ['date', 'category', 'user', 'action'] : ['date', 'user', 'action']"
@@ -110,6 +133,8 @@ export default {
                 'notableNameChanges',
             ],
             publicCategory: 'notableNameChanges',
+            userQuery: '',
+            actionQuery: '',
         };
     },
     computed: {
@@ -118,22 +143,31 @@ export default {
         ]),
     },
     async created () {
-        const searchMode = this.loggedInUser.isNat ? 'search' : 'public';
-        const category = this.loggedInUser.isNat ? this.category : this.publicCategory;
-
-        const logs = await this.$http.initialRequest(`/logs/${searchMode}/${category}/0`);
+        const logs = await this.$http.initialRequest(this.logsUrl(0));
 
         if (!logs.error) {
             this.logs = logs;
         }
     },
     methods: {
-        async loadCategory (e) {
+        logsUrl (skip) {
             const searchMode = this.loggedInUser.isNat ? 'search' : 'public';
             const category = this.loggedInUser.isNat ? this.category : this.publicCategory;
+            const params = new URLSearchParams();
+            const user = this.userQuery && this.userQuery.trim();
+            const action = this.actionQuery && this.actionQuery.trim();
+
+            if (user) params.set('user', user);
+            if (action) params.set('action', action);
+
+            const query = params.toString();
+
+            return `/logs/${searchMode}/${category}/${skip}${query ? `?${query}` : ''}`;
+        },
+        async loadCategory (e) {
             this.skip = 0;
 
-            const logs = await this.$http.executeGet(`/logs/${searchMode}/${category}/${this.skip}`, e);
+            const logs = await this.$http.executeGet(this.logsUrl(this.skip), e);
 
             if (!logs.error) {
                 this.skip += 300;
@@ -141,10 +175,7 @@ export default {
             }
         },
         async showMore (e) {
-            const searchMode = this.loggedInUser.isNat ? 'search' : 'public';
-            const category = this.loggedInUser.isNat ? this.category : this.publicCategory;
-
-            const logs = await this.$http.executeGet(`/logs/${searchMode}/${category}/${this.skip}`, e);
+            const logs = await this.$http.executeGet(this.logsUrl(this.skip), e);
 
             if (!logs.error) {
                 this.skip += 300;
