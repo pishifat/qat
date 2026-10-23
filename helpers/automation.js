@@ -469,28 +469,32 @@ const notifyApplicationEvaluations = cron.schedule('2 17 * * *', async () => {
             if (needsNewEvaluator) {
                 // add new evaluator to app
                 const natEvaluatorOsuIds = app.natEvaluators.map(n => n.osuId);
+                const bnEvaluatorOsuIds = app.bnEvaluators.map(n => n.osuId);
                 const reviewerOsuIds = app.reviews.map(r => r.evaluator.osuId);
-                const excludeOsuIds = natEvaluatorOsuIds.concat(reviewerOsuIds);
+                const excludeOsuIds = [...new Set(natEvaluatorOsuIds.concat(bnEvaluatorOsuIds, reviewerOsuIds, [app.user.osuId]))];
                 const newEvaluatorArray = await User.getAssignedNat(app.mode, app.user.id, excludeOsuIds, 1);
                 const newEvaluator = newEvaluatorArray[0];
-                app.natEvaluators.push(newEvaluator._id);
-                app.rerolls.push({
-                    createdAt: new Date(),
-                    newEvaluator: newEvaluator._id,
-                    type: 'automatic',
-                });
-                
-                await app.save();
 
-                // add new user webhook
-                await discord.webhookPost(
-                    [{
-                        color: discord.webhookColors.orange,
-                        description: `Added **${newEvaluator.username}** as NAT evaluator for [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
-                    }],
-                    app.mode
-                );
-                await util.sleep(500);
+                if (newEvaluator) {
+                    app.natEvaluators.push(newEvaluator._id);
+                    app.rerolls.push({
+                        createdAt: new Date(),
+                        newEvaluator: newEvaluator._id,
+                        type: 'automatic',
+                    });
+
+                    await app.save();
+
+                    // add new user webhook
+                    await discord.webhookPost(
+                        [{
+                            color: discord.webhookColors.orange,
+                            description: `Added **${newEvaluator.username}** as NAT evaluator for [**${app.user.username}**'s BN app](http://bn.mappersguild.com/appeval?id=${app.id})`,
+                        }],
+                        app.mode
+                    );
+                    await util.sleep(500);
+                }
 
                 // get updated evaluators
                 await app.populate([
@@ -595,14 +599,14 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             // repopulate with evaluator details
             await eval
                 .populate([
-                    { path: 'natEvaluators', select: 'username discordId isBnEvaluator' },
-                    { path: 'bnEvaluators', select: 'username discordId isBnEvaluator' },
+                    { path: 'natEvaluators', select: 'username osuId discordId isBnEvaluator' },
+                    { path: 'bnEvaluators', select: 'username osuId discordId isBnEvaluator' },
                     {
                         path: 'reviews',
                         select: 'evaluator',
                         populate: {
                             path: 'evaluator',
-                            select: 'discordId isBnEvaluator',
+                            select: 'osuId discordId isBnEvaluator',
                         },
                     },
                 ]);
@@ -688,8 +692,9 @@ const notifyCurrentBnEvaluations = cron.schedule('3 17 * * *', async () => {
             if (needsNewEvaluator) {
                 // add new evaluator to app
                 const natEvaluatorOsuIds = eval.natEvaluators.map(n => n.osuId);
+                const bnEvaluatorOsuIds = eval.bnEvaluators.map(n => n.osuId);
                 const reviewerOsuIds = eval.reviews.map(r => r.evaluator.osuId);
-                const excludeOsuIds = natEvaluatorOsuIds.concat(reviewerOsuIds);
+                const excludeOsuIds = [...new Set(natEvaluatorOsuIds.concat(bnEvaluatorOsuIds, reviewerOsuIds, [eval.user.osuId]))];
                 const newEvaluatorArray = await User.getAssignedNat(eval.mode, eval.user.id, excludeOsuIds, 1);
                 const newEvaluator = newEvaluatorArray[0];
                 
