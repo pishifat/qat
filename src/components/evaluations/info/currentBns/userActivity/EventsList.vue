@@ -282,6 +282,10 @@ export default {
             }));
         },
         discussionBadgeClass(count) {
+            if (!this.loggedInUser || !this.loggedInUser.isNat) {
+                return 'text-bg-secondary';
+            }
+
             if (count < 5) return 'text-bg-danger';
             if (count <= 10) return 'text-bg-warning';
 
