@@ -183,4 +183,9 @@ evaluationSchema.loadClass(EvaluationService);
  */
 const Evaluation = mongoose.model('Evaluation', evaluationSchema);
 
+// index builds fail silently otherwise (e.g. the unique active index can't build while duplicates exist)
+Evaluation.on('index', err => {
+    if (err) console.error('Evaluation index build failed:', err.message);
+});
+
 module.exports = Evaluation;

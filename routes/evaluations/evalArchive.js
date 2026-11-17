@@ -223,6 +223,19 @@ router.post('/:id/unarchiveBn', middlewares.isNat, async (req, res) => {
     let evaluation = await Evaluation.findById(req.params.id).orFail();
     let user = await User.findById(evaluation.user).orFail();
 
+    // the archive may have spawned a follow-up eval; only one can be active per user/mode/kind
+    const followUpEval = await Evaluation.findOne({
+        _id: { $ne: evaluation._id },
+        user: evaluation.user,
+        mode: evaluation.mode,
+        kind: evaluation.kind,
+        active: true,
+    });
+
+    if (followUpEval && (followUpEval.reviews.length || followUpEval.selfSummary || followUpEval.discussion)) {
+        return res.json({ error: `${user.username} already has an active ${evaluation.mode} evaluation in progress. Archive or delete it first.` });
+    }
+
     // Remove left history. Add mode and BN group back if not hybrid
     if (evaluation.consensus === BnEvaluationConsensus.RemoveFromBn || evaluation.isResignation) {
         // TODO find somehow the actual history, relatedEvaluation === evaluation._id?
@@ -253,6 +266,10 @@ router.post('/:id/unarchiveBn', middlewares.isNat, async (req, res) => {
             mode: evaluation.mode,
             level: 'probation',
         });
+    }
+
+    if (followUpEval) {
+        await Evaluation.deleteOne({ _id: followUpEval._id, active: true });
     }
 
     await Promise.all([

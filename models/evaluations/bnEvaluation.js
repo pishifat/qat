@@ -47,6 +47,23 @@ bnEvaluationSchema.statics.createIfNoneActive = async function (doc) {
 };
 
 /**
+ * like createIfNoneActive, but if an active eval already exists, its deadline/activityToCheck are replaced with the new ones
+ * instead of being silently kept
+ */
+bnEvaluationSchema.statics.createOrResetActive = async function (doc) {
+    const userId = doc.user && doc.user._id ? doc.user._id : doc.user;
+    const existing = await this.findOne({ user: userId, mode: doc.mode, active: true });
+
+    if (!existing) return this.createIfNoneActive(doc);
+
+    existing.deadline = doc.deadline;
+    existing.activityToCheck = doc.activityToCheck;
+    await existing.save();
+
+    return existing;
+};
+
+/**
  * @type {import('../interfaces/evaluations').IBnEvaluationModel}
  */
 const BnEvaluation = Evaluation.discriminator('currentBn', bnEvaluationSchema);

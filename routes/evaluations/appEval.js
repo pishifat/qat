@@ -390,7 +390,8 @@ router.post('/setComplete/', middlewares.isNatOrTrialNat, async (req, res) => {
             let deadline = new Date();
             deadline.setDate(deadline.getDate() + activityToCheck);
 
-            await BnEvaluation.createIfNoneActive({
+            // a lingering active eval would otherwise keep its old deadline instead of the new BN's
+            await BnEvaluation.createOrResetActive({
                 user: evaluation.user,
                 mode: evaluation.mode,
                 deadline,
