@@ -18,8 +18,8 @@ const discussionSchema = new mongoose.Schema({
     agreeOverwriteText: { type: String },
     neutralOverwriteText: { type: String },
     disagreeOverwriteText: { type: String },
-    imageSimilarityMethod: { type: String, enum: ['phash', 'clip'] },
-    imageSimilarity: { type: mongoose.Schema.Types.Mixed },
+    imageSimilarityMethod: { type: String },
+    imageSimilarity: { type: String },
 }, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 /**

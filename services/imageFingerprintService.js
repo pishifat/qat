@@ -1,6 +1,6 @@
 const sharp = require('sharp');
 const imageSimilarityService = require('./imageSimilarityService');
-const { resolveDiscussionImageUrl } = require('../helpers/discussionImage');
+const { isDiscussionImageUrl, resolveDiscussionImageUrl } = require('../helpers/discussionImage');
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25MB
 const DOWNLOAD_TIMEOUT_MS = 60000;
@@ -46,20 +46,29 @@ async function normalizeImage(buffer) {
     return sharp(buffer).rotate().toBuffer();
 }
 
-async function fingerprintFromBuffer(buffer, method = imageSimilarityService.DEFAULT_METHOD) {
+async function fingerprintFromBuffer(buffer) {
     const normalized = await normalizeImage(buffer);
-    const fingerprint = await imageSimilarityService.computeFingerprint(normalized, method);
-
-    return {
-        fingerprint,
-        method,
-    };
+    return imageSimilarityService.computeFingerprint(normalized);
 }
 
-async function fingerprintFromUrl(url, method = imageSimilarityService.DEFAULT_METHOD) {
+async function fingerprintFromUrl(url) {
     const resolvedUrl = resolveDiscussionImageUrl(url) || url;
     const buffer = await downloadImage(resolvedUrl);
-    return fingerprintFromBuffer(buffer, method);
+    return fingerprintFromBuffer(buffer);
+}
+
+async function getFingerprintFields(url) {
+    if (!isDiscussionImageUrl(url)) return {};
+
+    try {
+        return {
+            imageSimilarity: await fingerprintFromUrl(url),
+            imageSimilarityMethod: imageSimilarityService.METHOD,
+        };
+    } catch (error) {
+        console.warn(`CR image fingerprint failed for ${url}: ${error.message}`);
+        return {};
+    }
 }
 
 module.exports = {
@@ -67,4 +76,5 @@ module.exports = {
     downloadImage,
     fingerprintFromBuffer,
     fingerprintFromUrl,
+    getFingerprintFields,
 };

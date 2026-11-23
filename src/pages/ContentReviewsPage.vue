@@ -36,6 +36,7 @@
                         v-for="discussion in activeDiscussionsList"
                         :key="discussion.id"
                         :discussion="discussion"
+                        :similarity-distance="similarityScores[discussion.id]"
                     />
                 </transition-group>
             </section>
@@ -59,6 +60,7 @@
                             v-for="discussion in archivedDiscussionsList"
                             :key="discussion.id"
                             :discussion="discussion"
+                            :similarity-distance="similarityScores[discussion.id]"
                         />
                     </transition-group>
                     <pagination-nav store-module="contentReviews" />
@@ -103,7 +105,7 @@ export default {
     },
     computed: {
         ...mapState(['loggedInUser']),
-        ...mapState('contentReviews', ['archivedPagination']),
+        ...mapState('contentReviews', ['archivedPagination', 'similarityScores']),
         ...mapGetters('contentReviews', [
             'activeDiscussionsList',
             'archivedDiscussionsList',
@@ -171,6 +173,7 @@ export default {
                     this.$store.commit('contentReviews/setDiscussionListData', {
                         active: data.active,
                         archived: data.archived,
+                        similarityScores: data.similarityScores,
                     });
                 }
             } finally {

@@ -7,6 +7,7 @@ const middlewares = require('../helpers/middlewares');
 const util = require('../helpers/util');
 const discord = require('../helpers/discord');
 const osuBot = require('../helpers/osuBot');
+const imageFingerprintService = require('../services/imageFingerprintService');
 
 const router = express.Router();
 
@@ -182,6 +183,8 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         });
     }
 
+    const fingerprintFields = await imageFingerprintService.getFingerprintFields(url);
+
     const contentReviews = await Discussion.find({ isContentReview: true });
     const title = `Content review #${contentReviews.length + 251}`;
     let shortReason = `Is this content appropriate for a beatmap? ${url}`;
@@ -197,6 +200,7 @@ router.post('/sendToContentReview/:id', async (req, res) => {
         neutralAllowed: false,
         reasonAllowed: true,
         isContentReview: true,
+        ...fingerprintFields,
     });
 
     await Report.findByIdAndUpdate(req.params.id, { isActive: false, feedback: `Report closed and replaced by discussion vote (${d.id})` });

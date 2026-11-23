@@ -1,21 +1,13 @@
 const imghash = require('imghash');
 
-const PHASH_MAX_DISTANCE = 10;
-const DEFAULT_METHOD = 'phash';
+const METHOD = 'blockhash';
+const MAX_DISTANCE = 10;
 
-async function computeFingerprint(buffer, method = DEFAULT_METHOD) {
-    if (method === 'clip') {
-        throw new Error('CLIP similarity is not implemented yet');
-    }
-
+async function computeFingerprint(buffer) {
     return imghash.hash(buffer, 8);
 }
 
-function distance(a, b, method = DEFAULT_METHOD) {
-    if (method === 'clip') {
-        throw new Error('CLIP similarity is not implemented yet');
-    }
-
+function distance(a, b) {
     if (!a || !b || a.length !== b.length) {
         return Infinity;
     }
@@ -32,22 +24,21 @@ function distance(a, b, method = DEFAULT_METHOD) {
 }
 
 function rankBySimilarity(queryFingerprint, candidates, options = {}) {
-    const maxDistance = options.maxDistance ?? PHASH_MAX_DISTANCE;
-    const method = options.method ?? DEFAULT_METHOD;
+    const maxDistance = options.maxDistance ?? MAX_DISTANCE;
 
     return candidates
-        .filter((c) => c.imageSimilarity && (!c.imageSimilarityMethod || c.imageSimilarityMethod === method))
+        .filter((c) => c.imageSimilarity)
         .map((c) => ({
             doc: c,
-            distance: distance(queryFingerprint, c.imageSimilarity, method),
+            distance: distance(queryFingerprint, c.imageSimilarity),
         }))
         .filter((entry) => entry.distance <= maxDistance)
         .sort((a, b) => a.distance - b.distance);
 }
 
 module.exports = {
-    PHASH_MAX_DISTANCE,
-    DEFAULT_METHOD,
+    METHOD,
+    MAX_DISTANCE,
     computeFingerprint,
     distance,
     rankBySimilarity,

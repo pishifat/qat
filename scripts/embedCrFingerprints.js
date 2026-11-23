@@ -2,7 +2,9 @@
  * Compute image similarity fingerprints for legacy content review image links.
  *
  * Usage:
- *   node scripts/embedCrFingerprints.js [--dry-run] [--method phash|clip] [--limit=N]
+ *   node scripts/embedCrFingerprints.js [--dry-run] [--force] [--limit=N]
+ *
+ * --force recomputes existing fingerprints, e.g. ones left stale by an edited link.
  */
 
 const mongoose = require('mongoose');
@@ -10,6 +12,7 @@ const config = require('../config.json');
 const Discussion = require('../models/discussion');
 const { isDiscussionImageUrl } = require('../helpers/discussionImage');
 const imageFingerprintService = require('../services/imageFingerprintService');
+const imageSimilarityService = require('../services/imageSimilarityService');
 
 const ansi = {
     reset: '\x1b[0m',
@@ -29,7 +32,7 @@ function parseArgs(argv) {
 
     return {
         dryRun: argv.includes('--dry-run'),
-        method: (argv.find((arg) => arg.startsWith('--method=')) || '--method=phash').split('=')[1],
+        force: argv.includes('--force'),
         limit: Number.isFinite(limit) && limit > 0 ? limit : null,
     };
 }
@@ -66,10 +69,22 @@ async function embedDocument(doc, options) {
     const legacyUrl = doc.discussionLink;
 
     if (!isDiscussionImageUrl(legacyUrl)) {
+        if (doc.imageSimilarity && options.force) {
+            if (options.dryRun) {
+                return { status: 'dry-run', reason: 'would clear stale fingerprint' };
+            }
+
+            doc.imageSimilarity = undefined;
+            doc.imageSimilarityMethod = undefined;
+            await doc.save();
+
+            return { status: 'success' };
+        }
+
         return { status: 'skipped', reason: 'not an image link' };
     }
 
-    if (doc.imageSimilarity) {
+    if (doc.imageSimilarity && !options.force) {
         return { status: 'skipped', reason: 'already has fingerprint' };
     }
 
@@ -77,10 +92,8 @@ async function embedDocument(doc, options) {
         return { status: 'dry-run', reason: 'would embed fingerprint' };
     }
 
-    const fingerprintResult = await imageFingerprintService.fingerprintFromUrl(legacyUrl, options.method);
-
-    doc.imageSimilarity = fingerprintResult.fingerprint;
-    doc.imageSimilarityMethod = fingerprintResult.method;
+    doc.imageSimilarity = await imageFingerprintService.fingerprintFromUrl(legacyUrl);
+    doc.imageSimilarityMethod = imageSimilarityService.METHOD;
     await doc.save();
 
     return { status: 'success' };
@@ -89,23 +102,13 @@ async function embedDocument(doc, options) {
 async function main() {
     const options = parseArgs(process.argv.slice(2));
 
-    if (!['phash', 'clip'].includes(options.method)) {
-        console.error(`${ansi.red}Invalid --method value. Use phash or clip.${ansi.reset}`);
-        process.exit(1);
-    }
-
-    if (options.method === 'clip') {
-        console.error(`${ansi.red}CLIP embedding is not implemented yet. Use --method=phash.${ansi.reset}`);
-        process.exit(1);
-    }
-
     await mongoose.connect(config.connection);
 
     let query = Discussion.find({
         isContentReview: true,
         discussionLink: { $exists: true, $ne: null },
     })
-        .select('_id discussionLink title imageSimilarity createdAt')
+        .select('_id discussionLink title imageSimilarity imageSimilarityMethod createdAt')
         .sort({ createdAt: -1 });
 
     if (options.limit) {
@@ -119,7 +122,7 @@ async function main() {
     const limitLabel = options.limit ? `limit=${options.limit} (most recent)` : 'no limit';
     logInfo(
         `Processing ${ansi.bold}${total}${ansi.reset} content reviews. `
-        + `${limitLabel}. dryRun=${options.dryRun} method=${options.method}`
+        + `${limitLabel}. dryRun=${options.dryRun} force=${options.force}`
     );
 
     for (let index = 0; index < docs.length; index++) {

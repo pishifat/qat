@@ -17,8 +17,8 @@ interface IDiscussionDocument extends Document {
     agreeOverwriteText: string;
     neutralOverwriteText: string;
     disagreeOverwriteText: string;
-    imageSimilarityMethod?: 'phash' | 'clip';
-    imageSimilarity?: string | number[];
+    imageSimilarityMethod?: 'blockhash';
+    imageSimilarity?: string;
     mediations?: IMediationDocument[];
     creator: IUserDocument;
     createdAt?: Date;

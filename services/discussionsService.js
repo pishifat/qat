@@ -6,7 +6,6 @@ const discord = require('../helpers/discord');
 const util = require('../helpers/util');
 const { websocketManager } = require('../helpers/websocket');
 const { escapeRegex } = require('../helpers/util');
-const { isDiscussionImageUrl } = require('../helpers/discussionImage');
 const imageFingerprintService = require('./imageFingerprintService');
 const imageSimilarityService = require('./imageSimilarityService');
 
@@ -310,18 +309,9 @@ async function submitDiscussion(body, session, userRequest) {
         if (disagreeOverwriteText.length) finalDisagreeText = disagreeOverwriteText;
     }
 
-    let imageSimilarity;
-    let imageSimilarityMethod;
-
-    if (isContentReview && discussionLink.length && isDiscussionImageUrl(discussionLink)) {
-        try {
-            const fingerprintResult = await imageFingerprintService.fingerprintFromUrl(discussionLink);
-            imageSimilarity = fingerprintResult.fingerprint;
-            imageSimilarityMethod = fingerprintResult.method;
-        } catch (error) {
-            console.warn(`CR image fingerprint failed for ${discussionLink}: ${error.message}`);
-        }
-    }
+    const fingerprintFields = isContentReview
+        ? await imageFingerprintService.getFingerprintFields(discussionLink)
+        : {};
 
     let discussion = await Discussion.create({
         discussionLink: discussionLink.length > 0 ? discussionLink : null,
@@ -337,7 +327,7 @@ async function submitDiscussion(body, session, userRequest) {
         agreeOverwriteText: finalAgreeText,
         neutralOverwriteText: finalNeutralText,
         disagreeOverwriteText: finalDisagreeText,
-        ...(imageSimilarity ? { imageSimilarity, imageSimilarityMethod } : {}),
+        ...fingerprintFields,
     });
 
     discussion = await Discussion.findById(discussion.id).populate(defaultPopulate);
@@ -480,6 +470,14 @@ async function updateDiscussion(id, body, session) {
         .populate(defaultPopulate)
         .orFail();
 
+    if (discussion.isContentReview && (discussion.discussionLink || '') !== discussionLink) {
+        const fingerprintFields = await imageFingerprintService.getFingerprintFields(discussionLink);
+
+        // undefined clears the old fingerprint, which no longer matches the link
+        discussion.imageSimilarity = fingerprintFields.imageSimilarity;
+        discussion.imageSimilarityMethod = fingerprintFields.imageSimilarityMethod;
+    }
+
     discussion.title = title;
     discussion.shortReason = shortReason;
     discussion.discussionLink = discussionLink;
@@ -519,12 +517,11 @@ async function setIsAcceptable(id, isAcceptable, session) {
     return { discussion, success: 'Updated' };
 }
 
-async function searchContentReviewsByImage(fileBuffer, archivedPage, limit, mongoId, hasFullReadAccess, method = imageSimilarityService.DEFAULT_METHOD) {
+async function searchContentReviewsByImage(fileBuffer, archivedPage, limit, mongoId, hasFullReadAccess) {
     let fingerprint;
 
     try {
-        const fingerprintResult = await imageFingerprintService.fingerprintFromBuffer(fileBuffer, method);
-        fingerprint = fingerprintResult.fingerprint;
+        fingerprint = await imageFingerprintService.fingerprintFromBuffer(fileBuffer);
     } catch (error) {
         return { error: error.message || 'Failed to process image' };
     }
@@ -540,10 +537,10 @@ async function searchContentReviewsByImage(fileBuffer, archivedPage, limit, mong
     }
 
     const candidates = await Discussion.find(filter)
-        .select(`${MINIMAL_SELECT} imageSimilarity imageSimilarityMethod isActive`)
+        .select(`${MINIMAL_SELECT} imageSimilarity isActive`)
         .lean();
 
-    const ranked = imageSimilarityService.rankBySimilarity(fingerprint, candidates, { method });
+    const ranked = imageSimilarityService.rankBySimilarity(fingerprint, candidates);
 
     if (!ranked.length) {
         return {

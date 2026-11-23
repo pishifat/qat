@@ -1,5 +1,4 @@
 const discussionsService = require('../services/discussionsService');
-const imageSimilarityService = require('../services/imageSimilarityService');
 
 /**
  * GET content reviews list
@@ -71,15 +70,13 @@ async function imageSearch(req, res) {
     const hasFullReadAccess = !!res.locals.userRequest.hasFullReadAccess;
     const archivedPage = Math.max(1, parseInt(req.body.archivedPage) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.body.limit) || 21));
-    const method = (req.body.method || imageSimilarityService.DEFAULT_METHOD).trim();
 
     const result = await discussionsService.searchContentReviewsByImage(
         req.file.buffer,
         archivedPage,
         limit,
         req.session.mongoId,
-        hasFullReadAccess,
-        method
+        hasFullReadAccess
     );
 
     if (result.error) {

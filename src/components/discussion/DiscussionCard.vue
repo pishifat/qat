@@ -54,6 +54,11 @@
                         </span>
                     </div>
 
+                    <div v-if="similarityLabel" class="small" :title="similarityTooltip">
+                        Similarity:
+                        <span class="fw-bold">{{ similarityLabel }}</span>
+                    </div>
+
                     <div
                         class="card-status"
                         :class="discussion.isActive ? 'status-bar-active' : 'status-bar-inactive'"
@@ -95,6 +100,9 @@ import ModeDisplay from '../ModeDisplay.vue';
 import DateDisplay from '../DateDisplay.vue';
 import AddVotes from '../evaluations/card/AddVotes.vue';
 
+// image fingerprints are 64-bit hashes, compared by number of differing bits
+const FINGERPRINT_BITS = 64;
+
 export default {
     name: 'DiscussionCard',
     components: {
@@ -106,6 +114,10 @@ export default {
         discussion: {
             type: Object,
             required: true,
+        },
+        similarityDistance: {
+            type: Number,
+            default: null,
         },
     },
     data() {
@@ -167,6 +179,13 @@ export default {
             if (this.contentType === 'image') return 'fas fa-image text-info';
             if (this.contentType === 'video') return 'fas fa-video text-danger';
             return 'fas fa-question-circle text-secondary';
+        },
+        similarityLabel() {
+            if (this.similarityDistance === null) return '';
+            return `${Math.round((1 - this.similarityDistance / FINGERPRINT_BITS) * 100)}%`;
+        },
+        similarityTooltip() {
+            return `${this.similarityDistance} of ${FINGERPRINT_BITS} fingerprint bits differ`;
         },
         consensusClass() {
             if (this.discussion.isAcceptable === true) return 'text-success';

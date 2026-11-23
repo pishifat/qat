@@ -15,6 +15,7 @@ export default {
         archivedPagination: { page: 1, limit: 21, totalCount: 0, totalPages: 1 },
         imageSearchFile: null,
         imageSearchPreview: null,
+        similarityScores: {},
     },
     mutations: {
         setSelectedDiscussionId(state, value) {
@@ -23,7 +24,8 @@ export default {
         setSelectedDiscussion(state, discussion) {
             state.selectedDiscussionData = discussion;
         },
-        setDiscussionListData(state, { active, archived }) {
+        setDiscussionListData(state, { active, archived, similarityScores }) {
+            state.similarityScores = similarityScores || {};
             if (active) state.activeDiscussions = active;
             if (archived) {
                 state.archivedDiscussions = archived.discussions || [];

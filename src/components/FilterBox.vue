@@ -31,9 +31,13 @@
                 allow-any-image
                 :paste-armed="imageSearchPasteArmed"
                 active-label="Image search active"
+                :max-bytes="imageSearchMaxBytes"
+                max-size-message="Image must be 25MB or smaller"
+                invalid-type-message="File must be an image"
                 empty-text="Paste or drop an image here to search by similarity"
                 :model-value="imageSearchFile"
                 @update:model-value="setImageSearchFile"
+                @error="showImageSearchError"
             />
         </div>
 
@@ -80,6 +84,9 @@
 <script>
 import ImageDropzone from './ImageDropzone.vue';
 
+// keep in sync with MAX_BYTES in services/imageFingerprintService.js
+const IMAGE_SEARCH_MAX_BYTES = 25 * 1024 * 1024;
+
 export default {
     components: {
         ImageDropzone,
@@ -113,6 +120,7 @@ export default {
     data() {
         return {
             imageSearchPasteArmed: false,
+            imageSearchMaxBytes: IMAGE_SEARCH_MAX_BYTES,
         };
     },
     computed: {
@@ -170,6 +178,9 @@ export default {
                 default:
                     return option;
             }
+        },
+        showImageSearchError(message) {
+            this.$store.dispatch('updateToastMessages', { message });
         },
         setImageSearchFile(file) {
             if (!file) {
